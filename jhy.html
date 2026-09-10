@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영단어 학습 앱 (Flashcards, Matching, Quiz, Subjective)</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --secondary: #f39c12;
+            --bg-color: #f5f7fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --matched-bg: #2ecc71;
+            --wrong-bg: #e74c3c;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 탭 메뉴 스타일 */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #ddd;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section.active {
+            display: flex;
+        }
+
+        /* 공통 버튼 */
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* 상태 헤더 (타이머 및 점수) */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .timer-text { color: var(--wrong-bg); }
+        .score-text { color: var(--primary); }
+
+        /* 플래시카드 스타일 */
+        .flashcard-container {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            perspective: 1000px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        .flashcard.is-flipped {
+            transform: rotateX(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .card-front {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .card-back {
+            font-size: 24px;
+            transform: rotateX(180deg);
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* 짝 맞추기 게임 스타일 (왼쪽: 영단어 4개, 오른쪽: 뜻 4개) */
+        .matching-layout {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            gap: 20px;
+        }
+
+        .match-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .match-card {
+            background-color: var(--card-bg);
+            padding: 15px 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+            word-break: keep-all;
+        }
+
+        .match-card:hover:not(.matched):not(.hidden) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .match-card.selected {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .match-card.matched {
+            background-color: var(--matched-bg);
+            color: white;
+            cursor: default;
+            transform: scale(0.95);
+        }
+
+        .match-card.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+
+        .match-card.wrong {
+            background-color: var(--wrong-bg);
+            color: white;
+            animation: shake 0.4s;
+        }
+
+        #match-start-screen {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #match-result {
+            display: none;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        /* 퀴즈 공통 스타일 (객관식 & 주관식) */
+        .quiz-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .quiz-status {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .quiz-question {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 25px;
+            word-break: keep-all;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-option-btn {
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            background-color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .quiz-option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background-color: #f0f7ff;
+        }
+
+        .quiz-option-btn.correct {
+            background-color: var(--matched-bg);
+            color: white;
+            border-color: var(--matched-bg);
+        }
+
+        .quiz-option-btn.wrong {
+            background-color: var(--wrong-bg);
+            color: white;
+            border-color: var(--wrong-bg);
+        }
+
+        .quiz-option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        /* 주관식 입력창 스타일 */
+        .quiz-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .quiz-input:focus {
+            border-color: var(--primary);
+        }
+
+        .feedback-msg {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 25px;
+        }
+
+        .feedback-msg.correct { color: var(--matched-bg); }
+        .feedback-msg.wrong { color: var(--wrong-bg); }
+
+        .final-score {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 20px 0;
+        }
+
+        #quiz-result, #sub-quiz-result {
+            display: none;
+            text-align: center;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 500px) {
+            .quiz-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>핵심 숙어 마스터하기</h1>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('flashcards')">플래시카드</button>
+        <button class="tab-btn" onclick="switchTab('matching')">짝 맞추기</button>
+        <button class="tab-btn" onclick="switchTab('quiz')">객관식 퀴즈</button>
+        <button class="tab-btn" onclick="switchTab('subjective')">주관식 퀴즈</button>
+    </div>
+
+    <!-- 1. 플래시카드 섹션 -->
+    <div id="flashcards" class="section active">
+        <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+                <div class="card-face card-front" id="card-front"></div>
+                <div class="card-face card-back" id="card-back"></div>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn" style="margin-top:0;" onclick="prevCard()">이전</button>
+            <span id="card-counter" style="font-weight: bold;"></span>
+            <button class="btn" style="margin-top:0;" onclick="nextCard()">다음</button>
+        </div>
+        <p style="margin-top: 15px; color: #777; font-size: 14px;">카드를 클릭하면 뜻을 확인할 수 있습니다.</p>
+    </div>
+
+    <!-- 2. 짝 맞추기 섹션 (시작 화면 & 좌우 분할 게임) -->
+    <div id="matching" class="section">
+        <div id="match-start-screen">
+            <h2>짝 맞추기 아케이드</h2>
+            <p style="color: #666; margin-bottom: 20px; font-size: 14px;">60초 동안 왼쪽에 있는 영단어와 오른쪽에 있는 뜻을 빠르게 연결하여 점수를 높이세요!</p>
+            <button class="btn" onclick="startMatchingGame()">게임 시작</button>
+        </div>
+
+        <div id="match-game-area" style="display: none; width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <div class="game-header" id="match-header">
+                <div class="timer-text">남은 시간: <span id="match-time">60</span>초</div>
+                <div class="score-text">점수: <span id="match-score">0</span>점</div>
+            </div>
+            <div class="matching-layout">
+                <div class="match-column" id="left-column"></div>
+                <div class="match-column" id="right-column"></div>
+            </div>
+        </div>
+
+        <div id="match-result">
+            <h2>게임 종료! ⏱️</h2>
+            <div class="final-score">최종 점수: <span id="match-final-score">0</span>점</div>
+            <button class="btn" onclick="resetMatchScreen()">처음으로</button>
+        </div>
+    </div>
+
+    <!-- 3. 객관식 퀴즈 섹션 -->
+    <div id="quiz" class="section">
+        <div class="quiz-container">
+            <div id="quiz-content">
+                <div class="game-header">
+                    <div class="quiz-status" id="quiz-status">문제 1 / 6</div>
+                    <div class="timer-text">⏳ <span id="obj-time">15</span>초</div>
+                </div>
+                <div class="quiz-question" id="quiz-question"></div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <button class="btn" id="quiz-next-btn" style="display: none; width: 100%;" onclick="nextQuizQuestion()">다음 문제</button>
+            </div>
+            <div id="quiz-result">
+                <h2>객관식 퀴즈 완료! 🎉</h2>
+                <div class="final-score" id="quiz-score-text"></div>
+                <button class="btn" onclick="initQuiz()">다시 풀기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 주관식 퀴즈 섹션 -->
+    <div id="subjective" class="section">
+        <div class="quiz-container">
+            <div id="sub-quiz-content">
+                <div class="game-header">
+                    <div class="quiz-status" id="sub-quiz-status">문제 1 / 6</div>
+                    <div class="timer-text">⏳ <span id="sub-time">15</span>초</div>
+                </div>
+                <div class="quiz-question" id="sub-quiz-question" style="color: var(--secondary);"></div>
+                <input type="text" id="sub-quiz-input" class="quiz-input" placeholder="영어 표현을 입력하세요" autocomplete="off" onkeypress="handleSubEnter(event)">
+                <button class="btn" id="sub-submit-btn" style="width: 100%; margin-top: 0;" onclick="checkSubQuizAnswer()">정답 확인</button>
+                <div id="sub-feedback" class="feedback-msg"></div>
+                <button class="btn" id="sub-next-btn" style="display: none; width: 100%; margin-top: 0;" onclick="nextSubQuizQuestion()">다음 문제</button>
+            </div>
+            <div id="sub-quiz-result">
+                <h2>주관식 퀴즈 완료! 🏆</h2>
+                <div class="final-score" id="sub-quiz-score-text"></div>
+                <button class="btn" onclick="initSubQuiz()">다시 풀기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            { id: 1, en: "in charge of", ko: "~을 담당하는, 책임지는" },
+            { id: 2, en: "take part in", ko: "~에 참여하다" },
+            { id: 3, en: "figure out", ko: "알아내다, 이해하다" },
+            { id: 4, en: "work on", ko: "~에 노력을 들이다, 착수하다" },
+            { id: 5, en: "cut down on", ko: "~을 줄이다" },
+            { id: 6, en: "make a difference", ko: "차이를 만들다, 변화를 가져오다" }
+        ];
+
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        let matchInterval, objInterval, subInterval;
+
+        function clearAllTimers() {
+            clearInterval(matchInterval);
+            clearInterval(objInterval);
+            clearInterval(subInterval);
+        }
+
+        function switchTab(tabId) {
+            clearAllTimers();
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if(tabId === 'matching') resetMatchScreen();
+            if(tabId === 'quiz') initQuiz();
+            if(tabId === 'subjective') initSubQuiz();
+        }
+
+        // ---- 1. 플래시카드 로직 ----
+        let currentCardIndex = 0;
+        const flashcard = document.getElementById('flashcard');
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+        const cardCounter = document.getElementById('card-counter');
+
+        function updateCard() {
+            flashcard.classList.remove('is-flipped');
+            setTimeout(() => {
+                cardFront.textContent = vocabulary[currentCardIndex].en;
+                cardBack.textContent = vocabulary[currentCardIndex].ko;
+                cardCounter.textContent = `${currentCardIndex + 1} / ${vocabulary.length}`;
+            }, 150);
+        }
+
+        function flipCard() { flashcard.classList.toggle('is-flipped'); }
+        function nextCard() { currentCardIndex = (currentCardIndex + 1) % vocabulary.length; updateCard(); }
+        function prevCard() { currentCardIndex = (currentCardIndex - 1 + vocabulary.length) % vocabulary.length; updateCard(); }
+        updateCard();
+
+        // ---- 2. 짝 맞추기 게임 로직 (시작화면, 좌우 분할, 중복 방지) ----
+        let selectedElement = null;
+        let lockBoard = false;
+        let matchScore = 0;
+        let matchTimeLeft = 60;
+
+        function resetMatchScreen() {
+            clearAllTimers();
+            document.getElementById('match-start-screen').style.display = 'block';
+            document.getElementById('match-game-area').style.display = 'none';
+            document.getElementById('match-result').style.display = 'none';
+        }
+
+        function startMatchingGame() {
+            document.getElementById('match-start-screen').style.display = 'none';
+            document.getElementById('match-game-area').style.display = 'flex';
+            document.getElementById('match-result').style.display = 'none';
+            
+            matchScore = 0;
+            matchTimeLeft = 60;
+            selectedElement = null;
+            lockBoard = false;
+
+            document.getElementById('match-score').textContent = matchScore;
+            document.getElementById('match-time').textContent = matchTimeLeft;
+
+            populateMatchColumns();
+
+            matchInterval = setInterval(() => {
+                matchTimeLeft--;
+                document.getElementById('match-time').textContent = matchTimeLeft;
+                if (matchTimeLeft <= 0) {
+                    endMatchingGame();
+                }
+            }, 1000);
+        }
+
+        function getActiveIds(columnId) {
+            const cards = document.querySelectorAll(`#${columnId} .match-card`);
+            let ids = [];
+            cards.forEach(c => {
+                if(!c.classList.contains('hidden')) ids.push(Number(c.dataset.id));
+            });
+            return ids;
+        }
+
+        function populateMatchColumns() {
+            const leftCol = document.getElementById('left-column');
+            const rightCol = document.getElementById('right-column');
+            leftCol.innerHTML = '';
+            rightCol.innerHTML = '';
+
+            // 무작위 4개 선택 (중복 없음)
+            let selectedVocabs = shuffleArray(vocabulary).slice(0, 4);
+            let leftItems = shuffleArray([...selectedVocabs]);
+            let rightItems = shuffleArray([...selectedVocabs]);
+
+            leftItems.forEach(item => {
+                leftCol.appendChild(createMatchCard(item.en, item.id, 'left'));
+            });
+
+            rightItems.forEach(item => {
+                rightCol.appendChild(createMatchCard(item.ko, item.id, 'right'));
+            });
+        }
+
+        function createMatchCard(text, id, side) {
+            const div = document.createElement('div');
+            div.classList.add('match-card');
+            div.textContent = text;
+            div.dataset.id = id;
+            div.dataset.side = side;
+            div.addEventListener('click', handleMatchClick);
+            return div;
+        }
+
+        function handleMatchClick(e) {
+            if (lockBoard) return;
+            const clickedElement = e.target;
+
+            if (clickedElement.classList.contains('hidden') || clickedElement === selectedElement) return;
+            
+            // 같은 편(같은 열) 카드를 연속으로 누르면 선택 교체
+            if (selectedElement && selectedElement.dataset.side === clickedElement.dataset.side) {
+                selectedElement.classList.remove('selected');
+                selectedElement = clickedElement;
+                clickedElement.classList.add('selected');
+                return;
+            }
+
+            clickedElement.classList.add('selected');
+
+            if (!selectedElement) {
+                selectedElement = clickedElement;
+                return;
+            }
+
+            const firstCard = selectedElement;
+            const secondCard = clickedElement;
+            const firstId = firstCard.dataset.id;
+            const secondId = secondCard.dataset.id;
+
+            lockBoard = true;
+
+            // 아이디가 같으면 정답! (왼쪽 영단어 - 오른쪽 뜻 매칭)
+            if (firstId === secondId) {
+                firstCard.classList.remove('selected');
+                firstCard.classList.add('matched');
+                secondCard.classList.remove('selected');
+                secondCard.classList.add('matched');
+                
+                matchScore += 10;
+                document.getElementById('match-score').textContent = matchScore;
+
+                setTimeout(() => {
+                    firstCard.classList.add('hidden');
+                    secondCard.classList.add('hidden');
+                    firstCard.classList.remove('matched');
+                    secondCard.classList.remove('matched');
+
+                    // 한쪽 열의 모든 카드가 사라지면 새로운 4쌍으로 리프레시
+                    if (document.querySelectorAll('#left-column .match-card:not(.hidden)').length === 0) {
+                        populateMatchColumns();
+                    } else {
+                        // 남은 빈 자리에 중복되지 않는 새로운 1쌍 채우기
+                        replenishSinglePair();
+                    }
+
+                    selectedElement = null;
+                    lockBoard = false;
+                }, 300);
+
+            } else {
+                firstCard.classList.add('wrong');
+                secondCard.classList.add('wrong');
+
+                setTimeout(() => {
+                    firstCard.classList.remove('selected', 'wrong');
+                    secondCard.classList.remove('selected', 'wrong');
+                    selectedElement = null;
+                    lockBoard = false;
+                }, 800);
+            }
+        }
+
+        function replenishSinglePair() {
+            const leftCards = document.querySelectorAll('#left-column .match-card.hidden');
+            const rightCards = document.querySelectorAll('#right-column .match-card.hidden');
+            
+            if(leftCards.length > 0 && rightCards.length > 0) {
+                let activeIds = [...getActiveIds('left-column'), ...getActiveIds('right-column')];
+                let availableVocabs = vocabulary.filter(v => !activeIds.includes(v.id));
+                
+                if(availableVocabs.length > 0) {
+                    let newVocab = availableVocabs[Math.floor(Math.random() * availableVocabs.length)];
+                    
+                    let lCard = leftCards[0];
+                    lCard.textContent = newVocab.en;
+                    lCard.dataset.id = newVocab.id;
+                    lCard.classList.remove('hidden');
+
+                    let rCard = rightCards[0];
+                    rCard.textContent = newVocab.ko;
+                    rCard.dataset.id = newVocab.id;
+                    rCard.classList.remove('hidden');
+                }
+            }
+        }
+
+        function endMatchingGame() {
+            clearAllTimers();
+            document.getElementById('match-game-area').style.display = 'none';
+            document.getElementById('match-result').style.display = 'block';
+            document.getElementById('match-final-score').textContent = matchScore;
+        }
+
+        // ---- 3. 객관식 퀴즈 로직 ----
+        let objQuizIndex = 0;
+        let objQuizScore = 0;
+        let objQuizQuestions = [];
+        let objTimeLeft = 15;
+
+        function initQuiz() {
+            clearAllTimers();
+            objQuizQuestions = shuffleArray(vocabulary);
+            objQuizIndex = 0;
+            objQuizScore = 0;
+            document.getElementById('quiz-result').style.display = 'none';
+            document.getElementById('quiz-content').style.display = 'block';
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            clearInterval(objInterval);
+            const currentQ = objQuizQuestions[objQuizIndex];
+            document.getElementById('quiz-question').textContent = currentQ.en;
+            document.getElementById('quiz-status').textContent = `문제 ${objQuizIndex + 1} / ${objQuizQuestions.length}`;
+            document.getElementById('quiz-next-btn').style.display = 'none';
+            
+            objTimeLeft = 15;
+            document.getElementById('obj-time').textContent = objTimeLeft;
+
+            let options = [currentQ.ko];
+            let wrongOptions = vocabulary.filter(v => v.id !== currentQ.id).map(v => v.ko);
+            wrongOptions = shuffleArray(wrongOptions);
+            
+            options.push(wrongOptions[0], wrongOptions[1], wrongOptions[2]);
+            options = shuffleArray(options);
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(optText => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option-btn';
+                btn.textContent = optText;
+                btn.onclick = () => checkQuizAnswer(btn, optText, currentQ.ko);
+                optionsContainer.appendChild(btn);
+            });
+
+            objInterval = setInterval(() => {
+                objTimeLeft--;
+                document.getElementById('obj-time').textContent = objTimeLeft;
+                if(objTimeLeft <= 0) {
+                    clearInterval(objInterval);
+                    handleObjTimeout(currentQ.ko);
+                }
+            }, 1000);
+        }
+
+        function handleObjTimeout(correctText) {
+            const btns = document.querySelectorAll('.quiz-option-btn');
+            btns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correctText) btn.classList.add('correct');
+            });
+            document.getElementById('quiz-next-btn').style.display = 'inline-block';
+        }
+
+        function checkQuizAnswer(selectedBtn, selectedText, correctText) {
+            clearInterval(objInterval);
+            const btns = document.querySelectorAll('.quiz-option-btn');
+            btns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === correctText) btn.classList.add('correct');
+            });
+
+            if (selectedText === correctText) {
+                objQuizScore++;
+            } else {
+                selectedBtn.classList.add('wrong');
+            }
+            document.getElementById('quiz-next-btn').style.display = 'inline-block';
+        }
+
+        function nextQuizQuestion() {
+            objQuizIndex++;
+            if (objQuizIndex < objQuizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById('quiz-content').style.display = 'none';
+                document.getElementById('quiz-result').style.display = 'block';
+                document.getElementById('quiz-score-text').textContent = `${objQuizQuestions.length}문제 중 ${objQuizScore}문제 정답!`;
+            }
+        }
+
+        // ---- 4. 주관식 퀴즈 로직 ----
+        let subQuizIndex = 0;
+        let subQuizScore = 0;
+        let subQuizQuestions = [];
+        let subTimeLeft = 15;
+
+        function initSubQuiz() {
+            clearAllTimers();
+            subQuizQuestions = shuffleArray(vocabulary);
+            subQuizIndex = 0;
+            subQuizScore = 0;
+            document.getElementById('sub-quiz-result').style.display = 'none';
+            document.getElementById('sub-quiz-content').style.display = 'block';
+            loadSubQuizQuestion();
+        }
+
+        function loadSubQuizQuestion() {
+            clearInterval(subInterval);
+            const currentQ = subQuizQuestions[subQuizIndex];
+            document.getElementById('sub-quiz-question').textContent = currentQ.ko;
+            document.getElementById('sub-quiz-status').textContent = `문제 ${subQuizIndex + 1} / ${subQuizQuestions.length}`;
+            
+            subTimeLeft = 15;
+            document.getElementById('sub-time').textContent = subTimeLeft;
+
+            const inputField = document.getElementById('sub-quiz-input');
+            inputField.value = '';
+            inputField.disabled = false;
+            inputField.focus();
+
+            document.getElementById('sub-feedback').textContent = '';
+            document.getElementById('sub-feedback').className = 'feedback-msg';
+            document.getElementById('sub-submit-btn').style.display = 'inline-block';
+            document.getElementById('sub-next-btn').style.display = 'none';
+
+            subInterval = setInterval(() => {
+                subTimeLeft--;
+                document.getElementById('sub-time').textContent = subTimeLeft;
+                if(subTimeLeft <= 0) {
+                    clearInterval(subInterval);
+                    handleSubTimeout(currentQ.en);
+                }
+            }, 1000);
+        }
+
+        function handleSubTimeout(correctAnswer) {
+            document.getElementById('sub-quiz-input').disabled = true;
+            document.getElementById('sub-submit-btn').style.display = 'none';
+            document.getElementById('sub-next-btn').style.display = 'inline-block';
+            
+            const feedback = document.getElementById('sub-feedback');
+            feedback.innerHTML = `⏳ 시간 초과!<br><span style="font-size:16px; font-weight:normal; color:#333;">정답: <b>${correctAnswer}</b></span>`;
+            feedback.className = 'feedback-msg wrong';
+        }
+
+        function handleSubEnter(e) {
+            if (e.key === 'Enter') {
+                if(document.getElementById('sub-submit-btn').style.display !== 'none'){
+                    checkSubQuizAnswer();
+                } else if(document.getElementById('sub-next-btn').style.display !== 'none'){
+                    nextSubQuizQuestion();
+                }
+            }
+        }
+
+        function checkSubQuizAnswer() {
+            clearInterval(subInterval);
+            const currentQ = subQuizQuestions[subQuizIndex];
+            const inputField = document.getElementById('sub-quiz-input');
+            const feedback = document.getElementById('sub-feedback');
+            
+            const userAnswer = inputField.value.trim().toLowerCase();
+            const correctAnswer = currentQ.en.toLowerCase();
+
+            inputField.disabled = true;
+            document.getElementById('sub-submit-btn').style.display = 'none';
+            document.getElementById('sub-next-btn').style.display = 'inline-block';
+
+            if (userAnswer === correctAnswer) {
+                subQuizScore++;
+                feedback.textContent = "✅ 정답입니다!";
+                feedback.className = 'feedback-msg correct';
+            } else {
+                feedback.innerHTML = `❌ 오답입니다!<br><span style="font-size:16px; font-weight:normal; color:#333;">정답: <b>${currentQ.en}</b></span>`;
+                feedback.className = 'feedback-msg wrong';
+            }
+        }
+
+        function nextSubQuizQuestion() {
+            subQuizIndex++;
+            if (subQuizIndex < subQuizQuestions.length) {
+                loadSubQuizQuestion();
+            } else {
+                document.getElementById('sub-quiz-content').style.display = 'none';
+                document.getElementById('sub-quiz-result').style.display = 'block';
+                document.getElementById('sub-quiz-score-text').textContent = `${subQuizQuestions.length}문제 중 ${subQuizScore}문제 정답!`;
+            }
+        }
+    </script>
+</body>
+</html>
