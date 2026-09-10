@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expression Challenge - 10 Minute Individual Activity</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;color:#202938}
+.container{max-width:900px;margin:0 auto;padding:24px}
+.header{background:#fff;border-radius:18px;padding:22px 26px;margin-bottom:18px;box-shadow:0 3px 12px rgba(0,0,0,.07)}
+h1{margin:0 0 6px;font-size:28px}.subtitle{margin:0;color:#687386;font-size:15px}
+.progress-area{background:#fff;border-radius:14px;padding:14px 18px;margin-bottom:18px}
+.progress-top{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;margin-bottom:8px}
+.progress-bar{height:8px;background:#e6eaf0;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:#202938;transition:width .3s}
+.card{background:#fff;border-radius:18px;padding:28px;box-shadow:0 3px 12px rgba(0,0,0,.07)}
+.screen{display:none}.screen.active{display:block}
+.section-title{margin:0 0 8px;font-size:24px}
+.instruction{color:#5e6979;line-height:1.5;margin-bottom:22px}
+.expression-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.expression-card{border:1px solid #dfe4eb;border-radius:13px;padding:16px}
+.expression{font-size:20px;font-weight:800;margin-bottom:6px}
+.meaning{color:#626d7d;font-size:14px;margin-bottom:8px}
+.example{font-size:14px;line-height:1.45}.blank{font-weight:bold;text-decoration:underline}
+.question-count{color:#737e8e;font-size:14px;font-weight:bold;margin-bottom:12px}
+.scenario{font-size:21px;line-height:1.55;margin-bottom:22px}
+.options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.option{background:#fff;border:2px solid #dce2e9;border-radius:12px;padding:16px;font-size:16px;text-align:left;cursor:pointer;transition:.15s}
+.option:hover:not(:disabled){border-color:#7b8594;transform:translateY(-1px)}
+.option:disabled{cursor:default}.option.correct{border-color:#27834c;background:#edf8f1}.option.wrong{border-color:#c64b4b;background:#fff1f1}
+.feedback{min-height:28px;margin-top:18px;font-weight:bold;font-size:16px}.feedback.correct{color:#27834c}.feedback.wrong{color:#c64b4b}
+.personal-expression{font-size:27px;font-weight:800;margin:18px 0}
+.sentence{font-size:21px;line-height:1.8;background:#f6f8fa;border-radius:12px;padding:20px;margin-bottom:18px}
+.input{border:none;border-bottom:2px solid #202938;background:transparent;font-size:19px;width:270px;max-width:100%;outline:none;padding:4px}
+.hint{color:#778191;font-size:14px;margin-top:10px}
+.button-row{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+button.main-btn,button.secondary-btn{border:none;border-radius:11px;padding:13px 20px;font-size:15px;font-weight:bold;cursor:pointer}
+.main-btn{background:#202938;color:#fff}.secondary-btn{background:#e9edf2;color:#293241}
+.score-box{font-weight:bold;display:flex;align-items:center}
+.result{text-align:center;padding:20px 0}.result-score{font-size:48px;font-weight:800;margin:15px 0}
+.result-message{font-size:19px;line-height:1.5;color:#5e6979}
+.check-list{text-align:left;max-width:500px;margin:25px auto;line-height:2;color:#4f5a69}
+@media(max-width:650px){.container{padding:14px}.expression-grid,.options{grid-template-columns:1fr}h1{font-size:23px}.scenario{font-size:18px}.sentence{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>Everyday Expression Challenge</h1>
+<p class="subtitle">10-minute individual activity · Grade 8 · A2–B1</p>
+</div>
+
+<div class="progress-area">
+<div class="progress-top"><span id="stageText">Stage 1 of 3</span><span id="scoreText">Score: 0</span></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<section class="screen active" id="reviewScreen">
+<div class="card">
+<h2 class="section-title">1. Quick Review</h2>
+<p class="instruction">Read the six expressions. Then move on to the challenge.</p>
+<div class="expression-grid">
+<div class="expression-card"><div class="expression">keep track of</div><div class="meaning">계속 기록하다 / 확인하다</div><div class="example">I <span class="blank">keep track of</span> my daily steps.</div></div>
+<div class="expression-card"><div class="expression">take a break</div><div class="meaning">잠시 쉬다</div><div class="example">You should <span class="blank">take a break</span> after studying.</div></div>
+<div class="expression-card"><div class="expression">stay away from</div><div class="meaning">~을 멀리하다</div><div class="example">Try to <span class="blank">stay away from</span> your phone before bed.</div></div>
+<div class="expression-card"><div class="expression">get enough sleep</div><div class="meaning">충분히 자다</div><div class="example">You need to <span class="blank">get enough sleep</span>.</div></div>
+<div class="expression-card"><div class="expression">deal with</div><div class="meaning">~에 대처하다 / 다루다</div><div class="example">How do you <span class="blank">deal with</span> stress?</div></div>
+<div class="expression-card"><div class="expression">stick to</div><div class="meaning">~을 지키다 / 고수하다</div><div class="example">I try to <span class="blank">stick to</span> my study plan.</div></div>
+</div>
+<div class="button-row"><div></div><button class="main-btn" onclick="startChallenge()">Start Challenge →</button></div>
+</div>
+</section>
+
+<section class="screen" id="challengeScreen">
+<div class="card">
+<h2 class="section-title">2. Choose the Expression</h2>
+<p class="instruction">Read the situation carefully. Choose the expression that fits best.</p>
+<div class="question-count" id="questionCount"></div>
+<div class="scenario" id="scenario"></div>
+<div class="options" id="options"></div>
+<div class="feedback" id="feedback"></div>
+<div class="button-row"><div class="score-box" id="challengeScore">Score: 0</div><button class="main-btn" id="nextButton" onclick="nextQuestion()">Next →</button></div>
+</div>
+</section>
+
+<section class="screen" id="personalScreen">
+<div class="card">
+<h2 class="section-title">3. Make It Personal</h2>
+<p class="instruction">Complete each sentence with your own idea. Write a short answer. Be honest!</p>
+<div class="question-count" id="personalCount"></div>
+<div class="personal-expression" id="personalExpression"></div>
+<div class="sentence" id="personalSentence"></div>
+<div class="hint" id="personalHint"></div>
+<div class="button-row"><button class="secondary-btn" onclick="previousPersonal()">← Previous</button><button class="main-btn" id="personalNext" onclick="nextPersonal()">Next →</button></div>
+</div>
+</section>
+
+<section class="screen" id="resultScreen">
+<div class="card">
+<div class="result">
+<h2 class="section-title">🎉 Challenge Complete!</h2>
+<div class="result-score" id="finalScore"></div>
+<div class="result-message" id="finalMessage"></div>
+<div class="check-list">✓ I can understand six useful expressions.<br>✓ I can choose an expression from context.<br>✓ I can use the expressions to talk about my life.</div>
+<button class="main-btn" onclick="restartActivity()">Try Again</button>
+</div>
+</div>
+</section>
+</div>
+
+<script>
+const expressions=["keep track of","take a break","stay away from","get enough sleep","deal with","stick to"];
+
+const questions=[
+{scenario:"You want to know how many hours you study every day, so you write your study time in a notebook.",answer:"keep track of"},
+{scenario:"You've been doing homework for two hours. Your eyes are tired, so you stop studying for ten minutes.",answer:"take a break"},
+{scenario:"You want to sleep better, so you don't use your smartphone before going to bed.",answer:"stay away from"},
+{scenario:"You have to wake up at 7 a.m. tomorrow, so you go to bed early tonight.",answer:"get enough sleep"},
+{scenario:"You have a lot of homework and feel stressed. You make a plan to solve your problems one by one.",answer:"deal with"},
+{scenario:"You make a plan to exercise three times a week, and you continue following your plan.",answer:"stick to"},
+{scenario:"You use an app to check how many steps you walk every day.",answer:"keep track of"},
+{scenario:"Your friend has been studying for a long time without stopping. You tell your friend to rest for a few minutes.",answer:"take a break"},
+{scenario:"You want to eat healthier, so you try not to eat too much fast food.",answer:"stay away from"},
+{scenario:"You often stay up late watching videos, but you decide to sleep for 8 hours every night.",answer:"get enough sleep"},
+{scenario:"You are nervous about a difficult exam. You talk to your teacher and make a study plan.",answer:"deal with"},
+{scenario:"You decide to study English for 20 minutes every day, and you continue doing it.",answer:"stick to"}
+];
+
+const personalPrompts=[
+{expression:"keep track of",sentence:'I keep track of <input class="input" type="text" placeholder="your answer">.',hint:"Examples: my study time / my steps / my spending"},
+{expression:"take a break",sentence:'I take a break when <input class="input" type="text" placeholder="your answer">.',hint:"Examples: I feel tired / I study for an hour"},
+{expression:"stay away from",sentence:'I try to stay away from <input class="input" type="text" placeholder="your answer">.',hint:"Examples: junk food / my phone before bed"},
+{expression:"get enough sleep",sentence:'I get enough sleep when <input class="input" type="text" placeholder="your answer">.',hint:"Think about your bedtime or morning routine."},
+{expression:"deal with",sentence:'I deal with stress by <input class="input" type="text" placeholder="your answer">.',hint:"Examples: listening to music / talking to my friend"},
+{expression:"stick to",sentence:'I try to stick to <input class="input" type="text" placeholder="your answer">.',hint:"Examples: my study plan / my exercise routine"}
+];
+
+let questionIndex=0,score=0,answered=false,personalIndex=0;
+
+function showScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function updateProgress(stage){document.getElementById("stageText").textContent=`Stage ${stage} of 3`;document.getElementById("progressFill").style.width=(stage===1?20:stage===2?60:85)+"%";document.getElementById("scoreText").textContent=`Score: ${score}`}
+function startChallenge(){questionIndex=0;score=0;updateProgress(2);showScreen("challengeScreen");renderQuestion()}
+function shuffledExpressions(correct){return [correct,...expressions.filter(x=>x!==correct).sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5)}
+
+function renderQuestion(){
+const current=questions[questionIndex];answered=false;
+document.getElementById("questionCount").textContent=`Question ${questionIndex+1} / ${questions.length}`;
+document.getElementById("scenario").textContent=current.scenario;
+document.getElementById("feedback").textContent="";
+document.getElementById("feedback").className="feedback";
+document.getElementById("nextButton").textContent=questionIndex===questions.length-1?"Finish →":"Next →";
+const box=document.getElementById("options");box.innerHTML="";
+shuffledExpressions(current.answer).forEach(choice=>{const b=document.createElement("button");b.className="option";b.textContent=choice;b.onclick=()=>checkAnswer(b,choice);box.appendChild(b)});
+document.getElementById("challengeScore").textContent=`Score: ${score}`;updateProgress(2)
+}
+
+function checkAnswer(button,selected){
+if(answered)return;answered=true;const correct=questions[questionIndex].answer;
+document.querySelectorAll(".option").forEach(o=>o.disabled=true);
+if(selected===correct){button.classList.add("correct");score++;document.getElementById("feedback").textContent="Correct! ✓";document.getElementById("feedback").className="feedback correct"}
+else{button.classList.add("wrong");document.querySelectorAll(".option").forEach(o=>{if(o.textContent===correct)o.classList.add("correct")});document.getElementById("feedback").textContent=`Not quite. The answer is "${correct}".`;document.getElementById("feedback").className="feedback wrong"}
+document.getElementById("challengeScore").textContent=`Score: ${score}`;document.getElementById("scoreText").textContent=`Score: ${score}`
+}
+
+function nextQuestion(){
+if(!answered){document.getElementById("feedback").textContent="Choose an answer first.";document.getElementById("feedback").className="feedback wrong";return}
+if(questionIndex<questions.length-1){questionIndex++;renderQuestion()}else{personalIndex=0;updateProgress(3);showScreen("personalScreen");renderPersonal()}
+}
+
+function renderPersonal(){
+const current=personalPrompts[personalIndex];
+document.getElementById("personalCount").textContent=`Expression ${personalIndex+1} / ${personalPrompts.length}`;
+document.getElementById("personalExpression").textContent=current.expression;
+document.getElementById("personalSentence").innerHTML=current.sentence;
+document.getElementById("personalHint").textContent=current.hint;
+document.getElementById("personalNext").textContent=personalIndex===personalPrompts.length-1?"Finish Activity ✓":"Next →"
+}
+
+function previousPersonal(){if(personalIndex>0){personalIndex--;renderPersonal()}}
+function nextPersonal(){
+const input=document.querySelector("#personalSentence .input");
+if(input&&input.value.trim()===""){input.focus();input.style.borderBottom="2px solid #c64b4b";return}
+if(personalIndex<personalPrompts.length-1){personalIndex++;renderPersonal()}else{showResult()}
+}
+function showResult(){
+updateProgress(3);document.getElementById("progressFill").style.width="100%";showScreen("resultScreen");
+document.getElementById("finalScore").textContent=`${score} / ${questions.length}`;
+const p=score/questions.length;
+document.getElementById("finalMessage").textContent=p>=.9?"Excellent! You can use these expressions very well.":p>=.7?"Great job! You understand most of the expressions.":p>=.5?"Good try! Review the six expressions and try again.":"Keep practicing! Look at the context carefully and try again."
+}
+function restartActivity(){questionIndex=0;score=0;personalIndex=0;answered=false;document.getElementById("progressFill").style.width="0%";updateProgress(1);showScreen("reviewScreen")}
+updateProgress(1);
+</script>
+</body>
+</html>

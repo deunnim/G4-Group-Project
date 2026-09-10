@@ -1,0 +1,2449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Starting a Recycling Project</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, "Noto Sans KR", sans-serif;
+    background: #f4f7f5;
+    color: #26332c;
+}
+
+.container {
+    width: min(940px, 94%);
+    margin: 0 auto;
+    padding: 28px 0 60px;
+}
+
+header {
+    background: #2e7d5b;
+    color: white;
+    border-radius: 20px;
+    padding: 27px;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    margin: 0 0 8px;
+    font-size: 29px;
+}
+
+header p {
+    margin: 0;
+    font-size: 15px;
+}
+
+.progress-area {
+    background: white;
+    border-radius: 14px;
+    padding: 15px 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+}
+
+.progress-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    height: 9px;
+    background: #e1e9e4;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.3s;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 27px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+}
+
+.card h2 {
+    color: #286b4d;
+    margin-top: 0;
+    font-size: 21px;
+}
+
+/* =========================
+   READING
+========================= */
+
+.reading-text {
+    font-size: 16px;
+    line-height: 1.95;
+}
+
+.target {
+    font-weight: bold;
+    color: #176b45;
+    background: #e8f5ed;
+    padding: 2px 5px;
+    border-radius: 5px;
+}
+
+/* =========================
+   EXPRESSION GUIDE
+========================= */
+
+.expression-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.expression-card {
+    border: 2px solid #e0e8e3;
+    border-radius: 14px;
+    padding: 18px;
+    background: #fbfcfb;
+}
+
+.expression-title {
+    font-size: 21px;
+    font-weight: bold;
+    color: #176b45;
+    margin-bottom: 9px;
+}
+
+.korean-meaning {
+    font-size: 23px;
+    font-weight: bold;
+    color: #26332c;
+    margin-bottom: 7px;
+}
+
+.english-meaning {
+    font-size: 14px;
+    color: #68756d;
+    margin-bottom: 13px;
+}
+
+.example-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.example {
+    font-size: 14px;
+    line-height: 1.55;
+    background: #f1f6f3;
+    padding: 10px 11px;
+    border-radius: 8px;
+}
+
+.example-translation {
+    margin-top: 7px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.example-highlight {
+    font-weight: bold;
+    color: #176b45;
+}
+
+/* =========================
+   FLASHCARD
+========================= */
+
+.flashcard-section {
+    text-align: center;
+}
+
+.instruction {
+    color: #65736b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.direction-box {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 17px 0;
+    flex-wrap: wrap;
+}
+
+.direction-btn {
+    border: 2px solid #d7e2dc;
+    background: white;
+    color: #405047;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.direction-btn.active {
+    border-color: #2e7d5b;
+    background: #e8f5ed;
+    color: #176b45;
+}
+
+.flashcard-container {
+    width: min(570px, 100%);
+    height: 310px;
+    margin: 0 auto 18px;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.12);
+}
+
+.flashcard-front {
+    background: #e8f5ed;
+    border: 3px solid #70b58e;
+}
+
+.flashcard-back {
+    background: white;
+    border: 3px solid #70b58e;
+    transform: rotateY(180deg);
+}
+
+.flash-main {
+    font-size: 34px;
+    font-weight: bold;
+    color: #176b45;
+    margin-bottom: 17px;
+}
+
+.flash-korean {
+    font-size: 30px;
+    font-weight: bold;
+    color: #26332c;
+    margin-bottom: 12px;
+}
+
+.flash-secondary {
+    font-size: 14px;
+    color: #68756d;
+    line-height: 1.5;
+}
+
+.click-hint {
+    font-size: 13px;
+    color: #758078;
+    margin-top: 15px;
+}
+
+.speaker-btn {
+    border: none;
+    background: #2e7d5b;
+    color: white;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.speaker-btn:hover {
+    background: #246548;
+}
+
+.flash-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-number {
+    font-weight: bold;
+    color: #526158;
+    min-width: 60px;
+}
+
+/* =========================
+   RECALL QUIZ
+========================= */
+
+.recall-box {
+    max-width: 650px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.recall-label {
+    font-size: 14px;
+    color: #6c776f;
+    margin-bottom: 12px;
+}
+
+.recall-prompt {
+    background: #f0f7f3;
+    border: 2px solid #cde2d5;
+    border-radius: 16px;
+    padding: 28px 20px;
+    margin-bottom: 18px;
+}
+
+.recall-prompt-main {
+    font-size: 31px;
+    font-weight: bold;
+    color: #176b45;
+}
+
+.recall-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 17px;
+    border: 2px solid #d5dfda;
+    border-radius: 11px;
+    outline: none;
+    text-align: center;
+}
+
+.recall-input:focus {
+    border-color: #2e7d5b;
+}
+
+.recall-feedback {
+    min-height: 25px;
+    margin-top: 12px;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.feedback-correct {
+    color: #2e7d32;
+}
+
+.feedback-wrong {
+    color: #c0392b;
+}
+
+.recall-score {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #65736b;
+}
+
+.recall-complete {
+    display: none;
+    margin-top: 18px;
+    background: #f0f8f3;
+    border: 2px solid #a8d5b8;
+    border-radius: 13px;
+    padding: 17px;
+    font-weight: bold;
+}
+
+/* =========================
+   MULTIPLE CHOICE
+========================= */
+
+.question {
+    margin: 26px 0;
+}
+
+.question-title {
+    font-weight: bold;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.options {
+    display: grid;
+    gap: 9px;
+}
+
+.option {
+    border: 2px solid #dce5df;
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.option:hover {
+    border-color: #65a985;
+    background: #f5fbf7;
+}
+
+.option.selected {
+    border-color: #2e7d5b;
+    background: #eaf6ef;
+}
+
+.option.correct {
+    border-color: #4caf50;
+    background: #e8f5e9;
+}
+
+.option.wrong {
+    border-color: #e57373;
+    background: #ffebee;
+}
+
+.quiz-feedback {
+    display: none;
+    margin-top: 9px;
+    padding: 9px 11px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.quiz-feedback.show {
+    display: block;
+}
+
+.quiz-feedback.correct {
+    background: #e8f5e9;
+    color: #276738;
+}
+
+.quiz-feedback.wrong {
+    background: #ffebee;
+    color: #a33a3a;
+}
+
+/* =========================
+   FINAL MATCHING
+========================= */
+
+.final-match-intro {
+    text-align: center;
+    color: #65736b;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.match-board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.match-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.match-item {
+    min-height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 2px solid #dce5df;
+    border-radius: 11px;
+    padding: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+.match-item:hover {
+    border-color: #65a985;
+    background: #f5fbf7;
+}
+
+.match-item.selected {
+    border-color: #2e7d5b;
+    background: #e8f5ed;
+}
+
+.match-item.matched {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+    transition: 0.4s;
+}
+
+.match-feedback {
+    text-align: center;
+    min-height: 26px;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.match-correct {
+    color: #2e7d32;
+}
+
+.match-wrong {
+    color: #c0392b;
+}
+
+/* =========================
+   BUTTONS / RESULT
+========================= */
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 17px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary {
+    background: #2e7d5b;
+    color: white;
+}
+
+.primary:hover {
+    background: #246548;
+}
+
+.secondary {
+    background: #e7ede9;
+    color: #304138;
+}
+
+.result {
+    display: none;
+    text-align: center;
+    background: #f0f8f3;
+    border: 2px solid #a8d5b8;
+}
+
+.result.show {
+    display: block;
+}
+
+.score {
+    font-size: 40px;
+    font-weight: bold;
+    color: #2e7d5b;
+    margin: 10px 0;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 650px) {
+
+    .expression-grid,
+    .match-board {
+        grid-template-columns: 1fr;
+    }
+
+    .flash-main {
+        font-size: 27px;
+    }
+
+    .flash-korean {
+        font-size: 25px;
+    }
+
+    .flashcard-container {
+        height: 300px;
+    }
+
+    .recall-prompt-main {
+        font-size: 26px;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header>
+
+    <h1>♻️ Starting a Recycling Project</h1>
+
+    <p>
+        Learn six useful expressions and practice them in different ways.
+    </p>
+
+</header>
+
+
+<!-- ==================================================
+     PROGRESS
+================================================== -->
+
+<div class="progress-area">
+
+    <div class="progress-top">
+        <span>Activity Progress</span>
+        <span>
+            <span id="progressText">0</span>%
+        </span>
+    </div>
+
+    <div class="progress-bar">
+        <div
+            class="progress-fill"
+            id="progressFill">
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     1. READING
+================================================== -->
+
+<section class="card">
+
+    <h2>1. Read the Story</h2>
+
+    <div class="reading-text">
+
+        A group of students wanted to
+        <span class="target">find out</span>
+        how much waste their school produced each day.
+
+        They decided to
+        <span class="target">set up</span>
+        recycling boxes for paper and plastic.
+
+        They also asked classmates to
+        <span class="target">sort out</span>
+        their waste carefully.
+
+        At first, many students did not
+        <span class="target">pay attention to</span>
+        the recycling signs, so the team
+        <span class="target">came up with</span>
+        a simple points game.
+
+        With more students joining the project,
+        the team was able to
+        <span class="target">carry out</span>
+        the plan for an entire month.
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     2. EXPRESSIONS
+================================================== -->
+
+<section class="card">
+
+    <h2>2. Learn the Expressions</h2>
+
+    <div class="expression-grid">
+
+
+        <!-- FIND OUT -->
+
+        <div class="expression-card">
+
+            <div class="expression-title">
+                find out
+            </div>
+
+            <div class="korean-meaning">
+                알아내다, 알게 되다
+            </div>
+
+            <div class="english-meaning">
+                to discover or learn something
+            </div>
+
+            <div class="example-label">
+                EXAMPLE
+            </div>
+
+            <div class="example">
+                We wanted to
+                <span class="example-highlight">find out</span>
+                how much waste the school produced.
+            </div>
+
+            <div class="example-translation">
+                → 우리는 학교에서 얼마나 많은 쓰레기가 나오는지
+                <b>알아내고</b> 싶었다.
+            </div>
+
+        </div>
+
+
+        <!-- SET UP -->
+
+        <div class="expression-card">
+
+            <div class="expression-title">
+                set up
+            </div>
+
+            <div class="korean-meaning">
+                설치하다, 마련하다
+            </div>
+
+            <div class="english-meaning">
+                to arrange or establish something
+            </div>
+
+            <div class="example-label">
+                EXAMPLE
+            </div>
+
+            <div class="example">
+                They
+                <span class="example-highlight">set up</span>
+                recycling boxes near the classrooms.
+            </div>
+
+            <div class="example-translation">
+                → 그들은 교실 근처에 재활용 상자를
+                <b>설치했다.</b>
+            </div>
+
+        </div>
+
+
+        <!-- SORT OUT -->
+
+        <div class="expression-card">
+
+            <div class="expression-title">
+                sort out
+            </div>
+
+            <div class="korean-meaning">
+                분류하다, 정리하다
+            </div>
+
+            <div class="english-meaning">
+                to separate things into groups
+            </div>
+
+            <div class="example-label">
+                EXAMPLE
+            </div>
+
+            <div class="example">
+                Please
+                <span class="example-highlight">sort out</span>
+                the paper and plastic.
+            </div>
+
+            <div class="example-translation">
+                → 종이와 플라스틱을
+                <b>분류해 주세요.</b>
+            </div>
+
+        </div>
+
+
+        <!-- PAY ATTENTION TO -->
+
+        <div class="expression-card">
+
+            <div class="expression-title">
+                pay attention to
+            </div>
+
+            <div class="korean-meaning">
+                ~에 주의를 기울이다
+            </div>
+
+            <div class="english-meaning">
+                to watch or listen carefully
+            </div>
+
+            <div class="example-label">
+                EXAMPLE
+            </div>
+
+            <div class="example">
+                Please
+                <span class="example-highlight">pay attention to</span>
+                the recycling signs.
+            </div>
+
+            <div class="example-translation">
+                → 재활용 표지판에
+                <b>주의를 기울여 주세요.</b>
+            </div>
+
+        </div>
+
+
+        <!-- COME UP WITH -->
+
+        <div class="expression-card">
+
+            <div class="expression-title">
+                come up with
+            </div>
+
+            <div class="korean-meaning">
+                ~을 생각해 내다
+            </div>
+
+            <div class="english-meaning">
+                to think of an idea or plan
+            </div>
+
+            <div class="example-label">
+                EXAMPLE
+            </div>
+
+            <div class="example">
+                The team
+                <span class="example-highlight">came up with</span>
+                a simple points game.
+            </div>
+
+            <div class="example-translation">
+                → 그 팀은 간단한 점수 게임을
+                <b>생각해 냈다.</b>
+            </div>
+
+        </div>
+
+
+        <!-- CARRY OUT -->
+
+        <div class="expression-card">
+
+            <div class="expression-title">
+                carry out
+            </div>
+
+            <div class="korean-meaning">
+                실행하다, 실시하다
+            </div>
+
+            <div class="english-meaning">
+                to do or complete a plan
+            </div>
+
+            <div class="example-label">
+                EXAMPLE
+            </div>
+
+            <div class="example">
+                They
+                <span class="example-highlight">carried out</span>
+                the plan for a month.
+            </div>
+
+            <div class="example-translation">
+                → 그들은 한 달 동안 그 계획을
+                <b>실행했다.</b>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     3. FLASHCARDS
+================================================== -->
+
+<section class="card flashcard-section">
+
+    <h2>3. Flashcards</h2>
+
+    <p class="instruction">
+        Choose a direction. Then click the card to flip it.
+        When English appears, you can listen to the pronunciation.
+    </p>
+
+
+    <!-- DIRECTION -->
+
+    <div class="direction-box">
+
+        <button
+            id="flashEnglishBtn"
+            class="direction-btn active"
+            onclick="setFlashDirection('english')">
+
+            English → Korean
+
+        </button>
+
+        <button
+            id="flashKoreanBtn"
+            class="direction-btn"
+            onclick="setFlashDirection('korean')">
+
+            Korean → English
+
+        </button>
+
+    </div>
+
+
+    <!-- FLASHCARD -->
+
+    <div
+        class="flashcard-container"
+        onclick="flipFlashcard()">
+
+        <div
+            class="flashcard"
+            id="flashcard">
+
+
+            <!-- FRONT -->
+
+            <div class="flashcard-front">
+
+                <div
+                    class="flash-main"
+                    id="flashFront">
+                    find out
+                </div>
+
+                <button
+                    class="speaker-btn"
+                    id="speakerButton"
+                    onclick="speakCurrent(event)"
+                    title="Listen to pronunciation">
+
+                    🔊
+
+                </button>
+
+                <div class="click-hint">
+                    Click the card to flip
+                </div>
+
+            </div>
+
+
+            <!-- BACK -->
+
+            <div class="flashcard-back">
+
+                <div
+                    class="flash-korean"
+                    id="flashBackMain">
+                    알아내다, 알게 되다
+                </div>
+
+                <div
+                    class="flash-secondary"
+                    id="flashBackSecondary">
+                    to discover or learn something
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="flash-controls">
+
+        <button
+            class="secondary"
+            onclick="previousFlash(event)">
+            ← Previous
+        </button>
+
+        <div
+            class="card-number"
+            id="flashNumber">
+            1 / 6
+        </div>
+
+        <button
+            class="primary"
+            onclick="nextFlash(event)">
+            Next →
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     4. RECALL QUIZ
+================================================== -->
+
+<section class="card">
+
+    <h2>4. Recall the Expressions</h2>
+
+    <p class="instruction">
+        Type the answer from memory. The six expressions will appear in a random order.
+    </p>
+
+
+    <div class="direction-box">
+
+        <button
+            id="recallEnglishBtn"
+            class="direction-btn active"
+            onclick="setRecallDirection('englishToKorean')">
+
+            English → Korean
+
+        </button>
+
+        <button
+            id="recallKoreanBtn"
+            class="direction-btn"
+            onclick="setRecallDirection('koreanToEnglish')">
+
+            Korean → English
+
+        </button>
+
+    </div>
+
+
+    <div class="recall-box">
+
+        <div class="recall-label" id="recallLabel">
+            What is the Korean meaning?
+        </div>
+
+        <div class="recall-prompt">
+
+            <div
+                class="recall-prompt-main"
+                id="recallPrompt">
+                find out
+            </div>
+
+        </div>
+
+
+        <input
+            type="text"
+            id="recallInput"
+            class="recall-input"
+            placeholder="Type your answer here"
+            autocomplete="off"
+        >
+
+
+        <div
+            id="recallFeedback"
+            class="recall-feedback">
+        </div>
+
+
+        <div class="button-row"
+             style="justify-content:center;">
+
+            <button
+                class="primary"
+                onclick="checkRecall()">
+                Check
+            </button>
+
+            <button
+                class="secondary"
+                onclick="showRecallAnswer()">
+                Show Answer
+            </button>
+
+            <button
+                class="secondary"
+                onclick="restartRecall()">
+                Restart
+            </button>
+
+        </div>
+
+
+        <div class="recall-score">
+            Question
+            <span id="recallNumber">1</span>
+            / 6
+            &nbsp; | &nbsp;
+            Score:
+            <span id="recallScore">0</span>
+        </div>
+
+
+        <div
+            class="recall-complete"
+            id="recallComplete">
+
+            🎉 Great job! You completed all six expressions.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     5. CHOOSE THE BEST EXPRESSION
+================================================== -->
+
+<section class="card">
+
+    <h2>5. Choose the Best Expression</h2>
+
+
+    <!-- QUESTION 1 -->
+
+    <div class="question">
+
+        <div class="question-title">
+            1. The students wanted to ______ how much plastic waste the school produced.
+        </div>
+
+        <div
+            class="options"
+            data-question="1">
+
+            <div class="option" data-answer="find out">
+                find out
+            </div>
+
+            <div class="option" data-answer="set up">
+                set up
+            </div>
+
+            <div class="option" data-answer="carry out">
+                carry out
+            </div>
+
+            <div class="option" data-answer="sort out">
+                sort out
+            </div>
+
+        </div>
+
+        <div
+            class="quiz-feedback"
+            id="quizFeedback1">
+        </div>
+
+    </div>
+
+
+    <!-- QUESTION 2 -->
+
+    <div class="question">
+
+        <div class="question-title">
+            2. They decided to ______ recycling boxes near the classrooms.
+        </div>
+
+        <div
+            class="options"
+            data-question="2">
+
+            <div class="option" data-answer="pay attention to">
+                pay attention to
+            </div>
+
+            <div class="option" data-answer="set up">
+                set up
+            </div>
+
+            <div class="option" data-answer="find out">
+                find out
+            </div>
+
+            <div class="option" data-answer="come up with">
+                come up with
+            </div>
+
+        </div>
+
+        <div
+            class="quiz-feedback"
+            id="quizFeedback2">
+        </div>
+
+    </div>
+
+
+    <!-- QUESTION 3 -->
+
+    <div class="question">
+
+        <div class="question-title">
+            3. Students should ______ paper and plastic before recycling them.
+        </div>
+
+        <div
+            class="options"
+            data-question="3">
+
+            <div class="option" data-answer="sort out">
+                sort out
+            </div>
+
+            <div class="option" data-answer="carry out">
+                carry out
+            </div>
+
+            <div class="option" data-answer="set up">
+                set up
+            </div>
+
+            <div class="option" data-answer="find out">
+                find out
+            </div>
+
+        </div>
+
+        <div
+            class="quiz-feedback"
+            id="quizFeedback3">
+        </div>
+
+    </div>
+
+
+    <!-- QUESTION 4 -->
+
+    <div class="question">
+
+        <div class="question-title">
+            4. Please ______ the recycling signs carefully.
+        </div>
+
+        <div
+            class="options"
+            data-question="4">
+
+            <div class="option" data-answer="come up with">
+                come up with
+            </div>
+
+            <div class="option" data-answer="pay attention to">
+                pay attention to
+            </div>
+
+            <div class="option" data-answer="sort out">
+                sort out
+            </div>
+
+            <div class="option" data-answer="carry out">
+                carry out
+            </div>
+
+        </div>
+
+        <div
+            class="quiz-feedback"
+            id="quizFeedback4">
+        </div>
+
+    </div>
+
+
+    <!-- QUESTION 5 -->
+
+    <div class="question">
+
+        <div class="question-title">
+            5. The team ______ a simple points game to encourage students.
+        </div>
+
+        <div
+            class="options"
+            data-question="5">
+
+            <div class="option" data-answer="came up with">
+                came up with
+            </div>
+
+            <div class="option" data-answer="found out">
+                found out
+            </div>
+
+            <div class="option" data-answer="set up">
+                set up
+            </div>
+
+            <div class="option" data-answer="paid attention to">
+                paid attention to
+            </div>
+
+        </div>
+
+        <div
+            class="quiz-feedback"
+            id="quizFeedback5">
+        </div>
+
+    </div>
+
+
+    <!-- QUESTION 6 -->
+
+    <div class="question">
+
+        <div class="question-title">
+            6. The students were able to ______ the recycling plan for a whole month.
+        </div>
+
+        <div
+            class="options"
+            data-question="6">
+
+            <div class="option" data-answer="sort out">
+                sort out
+            </div>
+
+            <div class="option" data-answer="find out">
+                find out
+            </div>
+
+            <div class="option" data-answer="carry out">
+                carry out
+            </div>
+
+            <div class="option" data-answer="pay attention to">
+                pay attention to
+            </div>
+
+        </div>
+
+        <div
+            class="quiz-feedback"
+            id="quizFeedback6">
+        </div>
+
+    </div>
+
+
+    <div class="button-row">
+
+        <button
+            class="primary"
+            onclick="checkMultipleChoice()">
+            Check Answers
+        </button>
+
+        <button
+            class="secondary"
+            onclick="resetMultipleChoice()">
+            Try Again
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     6. FINAL MATCHING
+================================================== -->
+
+<section class="card">
+
+    <h2>6. Match the Expressions</h2>
+
+    <p class="final-match-intro">
+        Match each English expression with its Korean meaning.
+        The cards are placed in random positions.
+    </p>
+
+
+    <div class="match-board">
+
+        <div
+            class="match-column"
+            id="englishMatchColumn">
+        </div>
+
+        <div
+            class="match-column"
+            id="koreanMatchColumn">
+        </div>
+
+    </div>
+
+
+    <div
+        class="match-feedback"
+        id="matchFeedback">
+    </div>
+
+
+    <div
+        class="button-row"
+        style="justify-content:center;">
+
+        <button
+            class="secondary"
+            onclick="resetMatching()">
+            Shuffle Again
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ==================================================
+     RESULT
+================================================== -->
+
+<section
+    class="card result"
+    id="result">
+
+    <h2>🎉 Activity Complete!</h2>
+
+    <p>
+        You finished the recycling project expression practice.
+    </p>
+
+    <div class="score">
+        <span id="finalScore">0</span> / 6
+    </div>
+
+    <p id="resultMessage"></p>
+
+</section>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   DATA
+===================================================== */
+
+const expressions = [
+
+    {
+        english: "find out",
+        korean: "알아내다, 알게 되다",
+        meaning: "to discover or learn something",
+        example: "We wanted to find out how much waste the school produced."
+    },
+
+    {
+        english: "set up",
+        korean: "설치하다, 마련하다",
+        meaning: "to arrange or establish something",
+        example: "They set up recycling boxes near the classrooms."
+    },
+
+    {
+        english: "sort out",
+        korean: "분류하다, 정리하다",
+        meaning: "to separate things into groups",
+        example: "Please sort out the paper and plastic."
+    },
+
+    {
+        english: "pay attention to",
+        korean: "~에 주의를 기울이다",
+        meaning: "to watch or listen carefully",
+        example: "Please pay attention to the recycling signs."
+    },
+
+    {
+        english: "come up with",
+        korean: "~을 생각해 내다",
+        meaning: "to think of an idea or plan",
+        example: "The team came up with a simple points game."
+    },
+
+    {
+        english: "carry out",
+        korean: "실행하다, 실시하다",
+        meaning: "to do or complete a plan",
+        example: "They carried out the plan for a month."
+    }
+
+];
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+let completedParts = {
+    flashcard: false,
+    recall: false,
+    multipleChoice: false,
+    matching: false
+};
+
+
+function updateProgress() {
+
+    let completed = 0;
+
+    if (completedParts.flashcard) completed++;
+    if (completedParts.recall) completed++;
+    if (completedParts.multipleChoice) completed++;
+    if (completedParts.matching) completed++;
+
+    const progress = Math.round((completed / 4) * 100);
+
+    document.getElementById("progressText")
+        .textContent = progress;
+
+    document.getElementById("progressFill")
+        .style.width = progress + "%";
+}
+
+
+/* =====================================================
+   3. FLASHCARDS
+===================================================== */
+
+let flashDirection = "english";
+let flashIndex = 0;
+
+
+function setFlashDirection(direction) {
+
+    flashDirection = direction;
+
+    document.getElementById("flashEnglishBtn")
+        .classList.toggle(
+            "active",
+            direction === "english"
+        );
+
+    document.getElementById("flashKoreanBtn")
+        .classList.toggle(
+            "active",
+            direction === "korean"
+        );
+
+    updateFlashcard();
+
+}
+
+
+function updateFlashcard() {
+
+    const item = expressions[flashIndex];
+
+    const card =
+        document.getElementById("flashcard");
+
+    card.classList.remove("flipped");
+
+
+    if (flashDirection === "english") {
+
+        document.getElementById("flashFront")
+            .textContent = item.english;
+
+        document.getElementById("flashBackMain")
+            .textContent = item.korean;
+
+        document.getElementById("flashBackSecondary")
+            .textContent = item.meaning;
+
+    } else {
+
+        document.getElementById("flashFront")
+            .textContent = item.korean;
+
+        document.getElementById("flashBackMain")
+            .textContent = item.english;
+
+        document.getElementById("flashBackSecondary")
+            .textContent = item.meaning;
+
+    }
+
+
+    const speaker =
+        document.getElementById("speakerButton");
+
+    speaker.style.visibility =
+        flashDirection === "english"
+        ? "visible"
+        : "hidden";
+
+
+    document.getElementById("flashNumber")
+        .textContent =
+        `${flashIndex + 1} / ${expressions.length}`;
+
+}
+
+
+function flipFlashcard() {
+
+    document.getElementById("flashcard")
+        .classList.toggle("flipped");
+
+}
+
+
+function nextFlash(event) {
+
+    event.stopPropagation();
+
+    flashIndex++;
+
+    if (flashIndex >= expressions.length) {
+        flashIndex = 0;
+        completedParts.flashcard = true;
+        updateProgress();
+    }
+
+    updateFlashcard();
+
+}
+
+
+function previousFlash(event) {
+
+    event.stopPropagation();
+
+    flashIndex--;
+
+    if (flashIndex < 0) {
+        flashIndex = expressions.length - 1;
+    }
+
+    updateFlashcard();
+
+}
+
+
+function speakCurrent(event) {
+
+    event.stopPropagation();
+
+    if (flashDirection !== "english") {
+        return;
+    }
+
+    const text =
+        expressions[flashIndex].english;
+
+    if ("speechSynthesis" in window) {
+
+        window.speechSynthesis.cancel();
+
+        const utterance =
+            new SpeechSynthesisUtterance(text);
+
+        utterance.lang = "en-US";
+        utterance.rate = 0.85;
+        utterance.pitch = 1;
+
+        window.speechSynthesis.speak(utterance);
+
+    } else {
+
+        alert(
+            "Your browser does not support pronunciation playback."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   4. RECALL QUIZ
+===================================================== */
+
+let recallDirection = "englishToKorean";
+let recallOrder = [];
+let recallIndex = 0;
+let recallScore = 0;
+let recallAnswered = false;
+
+
+function shuffleArray(array) {
+
+    const newArray = [...array];
+
+    for (
+        let i = newArray.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(Math.random() * (i + 1));
+
+        [newArray[i], newArray[j]] =
+        [newArray[j], newArray[i]];
+
+    }
+
+    return newArray;
+}
+
+
+function setRecallDirection(direction) {
+
+    recallDirection = direction;
+
+    document.getElementById("recallEnglishBtn")
+        .classList.toggle(
+            "active",
+            direction === "englishToKorean"
+        );
+
+    document.getElementById("recallKoreanBtn")
+        .classList.toggle(
+            "active",
+            direction === "koreanToEnglish"
+        );
+
+    restartRecall();
+
+}
+
+
+function restartRecall() {
+
+    recallOrder =
+        shuffleArray(expressions.map((_, i) => i));
+
+    recallIndex = 0;
+    recallScore = 0;
+    recallAnswered = false;
+
+    document.getElementById("recallComplete")
+        .style.display = "none";
+
+    document.getElementById("recallScore")
+        .textContent = "0";
+
+    showRecallQuestion();
+
+}
+
+
+function showRecallQuestion() {
+
+    if (recallIndex >= recallOrder.length) {
+
+        document.getElementById("recallComplete")
+            .style.display = "block";
+
+        completedParts.recall = true;
+
+        updateProgress();
+
+        return;
+    }
+
+
+    recallAnswered = false;
+
+    const item =
+        expressions[recallOrder[recallIndex]];
+
+
+    const prompt =
+        document.getElementById("recallPrompt");
+
+    const label =
+        document.getElementById("recallLabel");
+
+
+    if (recallDirection === "englishToKorean") {
+
+        prompt.textContent = item.english;
+
+        label.textContent =
+            "What is the Korean meaning?";
+
+    } else {
+
+        prompt.textContent = item.korean;
+
+        label.textContent =
+            "What is the English expression?";
+
+    }
+
+
+    document.getElementById("recallNumber")
+        .textContent = recallIndex + 1;
+
+    document.getElementById("recallInput")
+        .value = "";
+
+    document.getElementById("recallInput")
+        .focus();
+
+    document.getElementById("recallFeedback")
+        .textContent = "";
+
+}
+
+
+function normalizeAnswer(text) {
+
+    return text
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+
+}
+
+
+function checkRecall() {
+
+    if (recallAnswered) {
+        return;
+    }
+
+    const input =
+        document.getElementById("recallInput")
+        .value
+        .trim();
+
+    if (!input) {
+        return;
+    }
+
+
+    const item =
+        expressions[recallOrder[recallIndex]];
+
+
+    let isCorrect = false;
+
+
+    if (recallDirection === "englishToKorean") {
+
+        const answer =
+            normalizeAnswer(input);
+
+        const acceptedAnswers = [
+
+            normalizeAnswer(item.korean),
+
+            "알아내다",
+            "알게 되다"
+
+        ];
+
+        isCorrect =
+            acceptedAnswers.includes(answer);
+
+    } else {
+
+        isCorrect =
+            normalizeAnswer(input) ===
+            normalizeAnswer(item.english);
+
+    }
+
+
+    const feedback =
+        document.getElementById("recallFeedback");
+
+
+    if (isCorrect) {
+
+        recallScore++;
+
+        document.getElementById("recallScore")
+            .textContent = recallScore;
+
+        feedback.textContent =
+            "✓ Correct!";
+
+        feedback.className =
+            "recall-feedback feedback-correct";
+
+    } else {
+
+        feedback.textContent =
+            "Try again or click Show Answer.";
+
+        feedback.className =
+            "recall-feedback feedback-wrong";
+
+        return;
+    }
+
+
+    recallAnswered = true;
+
+
+    setTimeout(() => {
+
+        recallIndex++;
+
+        showRecallQuestion();
+
+    }, 800);
+
+}
+
+
+function showRecallAnswer() {
+
+    const item =
+        expressions[recallOrder[recallIndex]];
+
+    const feedback =
+        document.getElementById("recallFeedback");
+
+
+    if (recallDirection === "englishToKorean") {
+
+        feedback.textContent =
+            "Answer: " + item.korean;
+
+    } else {
+
+        feedback.textContent =
+            "Answer: " + item.english;
+
+    }
+
+    feedback.className =
+        "recall-feedback";
+
+
+    recallAnswered = true;
+
+
+    setTimeout(() => {
+
+        recallIndex++;
+
+        showRecallQuestion();
+
+    }, 1200);
+
+}
+
+
+document.getElementById("recallInput")
+    .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+            checkRecall();
+        }
+
+    });
+
+
+/* =====================================================
+   5. MULTIPLE CHOICE
+===================================================== */
+
+const correctAnswers = {
+
+    1: "find out",
+    2: "set up",
+    3: "sort out",
+    4: "pay attention to",
+    5: "came up with",
+    6: "carry out"
+
+};
+
+
+let selectedAnswers = {};
+
+
+document.querySelectorAll(".options")
+    .forEach(group => {
+
+        group.querySelectorAll(".option")
+            .forEach(option => {
+
+                option.addEventListener(
+                    "click",
+                    () => {
+
+                        group.querySelectorAll(".option")
+                            .forEach(x => {
+
+                                x.classList.remove(
+                                    "selected"
+                                );
+
+                            });
+
+
+                        option.classList.add(
+                            "selected"
+                        );
+
+
+                        const question =
+                            group.dataset.question;
+
+                        selectedAnswers[question] =
+                            option.dataset.answer;
+
+                    }
+                );
+
+            });
+
+    });
+
+
+function checkMultipleChoice() {
+
+    let score = 0;
+
+
+    for (let i = 1; i <= 6; i++) {
+
+        const group =
+            document.querySelector(
+                `.options[data-question="${i}"]`
+            );
+
+        const options =
+            group.querySelectorAll(".option");
+
+        const feedback =
+            document.getElementById(
+                `quizFeedback${i}`
+            );
+
+
+        options.forEach(option => {
+
+            option.classList.remove(
+                "correct",
+                "wrong"
+            );
+
+
+            if (
+                option.dataset.answer ===
+                correctAnswers[i]
+            ) {
+
+                option.classList.add(
+                    "correct"
+                );
+
+            }
+
+        });
+
+
+        if (
+            selectedAnswers[i] ===
+            correctAnswers[i]
+        ) {
+
+            score++;
+
+            feedback.textContent =
+                "✓ Correct!";
+
+            feedback.className =
+                "quiz-feedback show correct";
+
+        } else {
+
+            if (selectedAnswers[i]) {
+
+                const selected =
+                    group.querySelector(
+                        `.option[data-answer="${selectedAnswers[i]}"]`
+                    );
+
+                if (selected) {
+                    selected.classList.add("wrong");
+                }
+
+            }
+
+
+            feedback.textContent =
+                "The correct answer is: " +
+                correctAnswers[i];
+
+            feedback.className =
+                "quiz-feedback show wrong";
+
+        }
+
+    }
+
+
+    if (score === 6) {
+
+        completedParts.multipleChoice = true;
+
+        updateProgress();
+
+    }
+
+
+    document.getElementById("finalScore")
+        .textContent = score;
+
+}
+
+
+function resetMultipleChoice() {
+
+    selectedAnswers = {};
+
+    document.querySelectorAll(".option")
+        .forEach(option => {
+
+            option.classList.remove(
+                "selected",
+                "correct",
+                "wrong"
+            );
+
+        });
+
+
+    document.querySelectorAll(".quiz-feedback")
+        .forEach(feedback => {
+
+            feedback.className =
+                "quiz-feedback";
+
+            feedback.textContent = "";
+
+        });
+
+}
+
+
+/* =====================================================
+   6. FINAL MATCHING
+===================================================== */
+
+let selectedEnglish = null;
+let selectedKorean = null;
+let matchedCount = 0;
+
+
+function createMatchingBoard() {
+
+    const englishColumn =
+        document.getElementById(
+            "englishMatchColumn"
+        );
+
+    const koreanColumn =
+        document.getElementById(
+            "koreanMatchColumn"
+        );
+
+
+    englishColumn.innerHTML = "";
+    koreanColumn.innerHTML = "";
+
+
+    selectedEnglish = null;
+    selectedKorean = null;
+    matchedCount = 0;
+
+
+    const englishItems =
+        shuffleArray(expressions);
+
+    const koreanItems =
+        shuffleArray(expressions);
+
+
+    englishItems.forEach(item => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "match-item english-match";
+
+        div.dataset.id =
+            item.english;
+
+        div.textContent =
+            item.english;
+
+        div.addEventListener(
+            "click",
+            () => selectEnglish(div)
+        );
+
+        englishColumn.appendChild(div);
+
+    });
+
+
+    koreanItems.forEach(item => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "match-item korean-match";
+
+        div.dataset.id =
+            item.english;
+
+        div.textContent =
+            item.korean;
+
+        div.addEventListener(
+            "click",
+            () => selectKorean(div)
+        );
+
+        koreanColumn.appendChild(div);
+
+    });
+
+
+    document.getElementById("matchFeedback")
+        .textContent = "";
+
+}
+
+
+function selectEnglish(item) {
+
+    if (
+        item.classList.contains("matched")
+    ) {
+        return;
+    }
+
+
+    document.querySelectorAll(
+        ".english-match"
+    ).forEach(x => {
+
+        x.classList.remove("selected");
+
+    });
+
+
+    item.classList.add("selected");
+
+    selectedEnglish = item;
+
+    checkMatch();
+
+}
+
+
+function selectKorean(item) {
+
+    if (
+        item.classList.contains("matched")
+    ) {
+        return;
+    }
+
+
+    document.querySelectorAll(
+        ".korean-match"
+    ).forEach(x => {
+
+        x.classList.remove("selected");
+
+    });
+
+
+    item.classList.add("selected");
+
+    selectedKorean = item;
+
+    checkMatch();
+
+}
+
+
+function checkMatch() {
+
+    if (
+        !selectedEnglish ||
+        !selectedKorean
+    ) {
+        return;
+    }
+
+
+    const feedback =
+        document.getElementById(
+            "matchFeedback"
+        );
+
+
+    if (
+        selectedEnglish.dataset.id ===
+        selectedKorean.dataset.id
+    ) {
+
+        selectedEnglish.classList.remove(
+            "selected"
+        );
+
+        selectedKorean.classList.remove(
+            "selected"
+        );
+
+
+        selectedEnglish.classList.add(
+            "matched"
+        );
+
+        selectedKorean.classList.add(
+            "matched"
+        );
+
+
+        matchedCount++;
+
+
+        feedback.textContent =
+            "✓ Correct match!";
+
+        feedback.className =
+            "match-feedback match-correct";
+
+
+        selectedEnglish = null;
+        selectedKorean = null;
+
+
+        if (matchedCount === expressions.length) {
+
+            completedParts.matching = true;
+
+            updateProgress();
+
+            setTimeout(() => {
+
+                feedback.textContent =
+                    "🎉 Excellent! You matched all six expressions!";
+
+            }, 450);
+
+        }
+
+    } else {
+
+        feedback.textContent =
+            "Not a match. Try again.";
+
+        feedback.className =
+            "match-feedback match-wrong";
+
+
+        selectedEnglish.classList.remove(
+            "selected"
+        );
+
+        selectedKorean.classList.remove(
+            "selected"
+        );
+
+
+        selectedEnglish = null;
+        selectedKorean = null;
+
+    }
+
+}
+
+
+function resetMatching() {
+
+    createMatchingBoard();
+
+}
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+updateFlashcard();
+
+restartRecall();
+
+createMatchingBoard();
+
+updateProgress();
+
+</script>
+
+</body>
+</html>

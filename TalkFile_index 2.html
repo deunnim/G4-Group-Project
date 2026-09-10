@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Better Study Habits</title>
+<style>
+  :root{
+    --navy:#1f2a44;
+    --blue:#3b6ee8;
+    --lightblue:#eaf1ff;
+    --green:#2fae66;
+    --red:#e15656;
+    --yellow:#ffb703;
+    --gray:#7a8299;
+    --bg:#f4f6fb;
+    --white:#ffffff;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', 'Malgun Gothic', sans-serif;
+    background:linear-gradient(135deg,#dce8ff,#f4f6fb 40%);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .app{
+    width:100%;
+    max-width:720px;
+    background:var(--white);
+    border-radius:24px;
+    box-shadow:0 20px 50px rgba(31,42,68,0.15);
+    padding:28px 26px 24px;
+    position:relative;
+    min-height:560px;
+    display:flex;
+    flex-direction:column;
+  }
+  .progress-wrap{
+    display:flex;
+    gap:6px;
+    margin-bottom:20px;
+  }
+  .progress-dot{
+    flex:1;
+    height:8px;
+    border-radius:6px;
+    background:#dfe4f0;
+    transition:background .3s;
+  }
+  .progress-dot.active{background:var(--blue);}
+  .progress-dot.done{background:var(--green);}
+  h1{
+    font-size:22px;
+    color:var(--navy);
+    margin:0 0 8px;
+  }
+  h2{
+    font-size:18px;
+    color:var(--navy);
+    margin:0 0 14px;
+  }
+  p{
+    color:#3b4256;
+    line-height:1.6;
+    font-size:15.5px;
+  }
+  .screen{display:none; flex-direction:column; flex:1;}
+  .screen.active{display:flex;}
+  .story-box{
+    background:var(--lightblue);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    font-size:16px;
+    line-height:1.9;
+    color:#25304d;
+  }
+  .expr{
+    background:var(--blue);
+    color:white;
+    padding:2px 6px;
+    border-radius:6px;
+    font-weight:600;
+    cursor:pointer;
+    position:relative;
+    white-space:nowrap;
+  }
+  .expr .tip{
+    display:none;
+    position:absolute;
+    bottom:130%;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--navy);
+    color:white;
+    padding:8px 10px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:400;
+    width:200px;
+    line-height:1.4;
+    z-index:5;
+    white-space:normal;
+  }
+  .expr:hover .tip, .expr:focus .tip{display:block;}
+  .hint{
+    margin-top:10px;
+    font-size:13px;
+    color:var(--gray);
+  }
+  .btn-row{
+    margin-top:auto;
+    padding-top:18px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+  }
+  button{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:600;
+    border:none;
+    border-radius:12px;
+    padding:12px 22px;
+    cursor:pointer;
+    transition:transform .1s, opacity .2s;
+  }
+  button:active{transform:scale(0.97);}
+  .btn-primary{
+    background:var(--blue);
+    color:white;
+  }
+  .btn-primary:disabled{
+    background:#c7d3ee;
+    cursor:not-allowed;
+  }
+  .btn-secondary{
+    background:#eef1f8;
+    color:var(--navy);
+  }
+  /* Matching screen */
+  .match-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:6px;
+  }
+  .match-col{display:flex; flex-direction:column; gap:10px;}
+  .card{
+    background:var(--lightblue);
+    border:2px solid transparent;
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:14.5px;
+    color:var(--navy);
+    cursor:pointer;
+    text-align:left;
+    line-height:1.4;
+    transition:all .15s;
+  }
+  .card.selected{border-color:var(--blue); background:#dbe7ff;}
+  .card.correct{
+    background:#e2f7ea;
+    border-color:var(--green);
+    color:#1f7a45;
+    cursor:default;
+  }
+  .card.wrong{
+    animation:shake .3s;
+    border-color:var(--red);
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
+  .match-status{
+    margin-top:12px;
+    font-size:13.5px;
+    color:var(--gray);
+  }
+  /* Fill in blank */
+  .fib-item{
+    background:var(--lightblue);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    font-size:15px;
+    color:#25304d;
+  }
+  .fib-item select{
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    padding:6px 8px;
+    border-radius:8px;
+    border:2px solid #c7d3ee;
+    background:white;
+    color:var(--navy);
+    margin:0 2px;
+  }
+  .fib-item.correct select{border-color:var(--green); background:#e2f7ea;}
+  .fib-item.wrong select{border-color:var(--red); background:#fdecec;}
+  .feedback-icon{font-weight:700; margin-left:6px;}
+  .feedback-icon.correct{color:var(--green);}
+  .feedback-icon.wrong{color:var(--red);}
+  /* MCQ */
+  .mcq-item{
+    background:var(--lightblue);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:14px;
+  }
+  .mcq-q{font-weight:600; color:var(--navy); margin-bottom:10px; font-size:15px;}
+  .mcq-options{display:flex; flex-direction:column; gap:8px;}
+  .mcq-opt{
+    background:white;
+    border:2px solid #dfe4f0;
+    border-radius:10px;
+    padding:10px 12px;
+    text-align:left;
+    font-size:14.5px;
+    color:#25304d;
+    cursor:pointer;
+  }
+  .mcq-opt.selected{border-color:var(--blue);}
+  .mcq-opt.correct{border-color:var(--green); background:#e2f7ea; color:#1f7a45; font-weight:600;}
+  .mcq-opt.wrong{border-color:var(--red); background:#fdecec; color:#a33; }
+  .mcq-opt:disabled{cursor:default;}
+  /* Results */
+  .score-banner{
+    background:linear-gradient(135deg,var(--blue),#5b8def);
+    color:white;
+    border-radius:16px;
+    padding:20px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .score-banner .big{font-size:36px; font-weight:800;}
+  .review-list{display:flex; flex-direction:column; gap:8px;}
+  .review-item{
+    background:var(--lightblue);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:14px;
+    color:var(--navy);
+  }
+  .review-item b{color:var(--blue);}
+  .small-note{font-size:13px; color:var(--gray); margin-top:14px; text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="progress-wrap" id="progressWrap"></div>
+
+  <!-- SCREEN 0: INTRO -->
+  <div class="screen active" data-screen="0">
+    <h1>📚 Building Better Study Habits</h1>
+    <p>In this activity, you will learn <b>6 useful English expressions</b> by reading a short story about Jisoo, then practicing them in different ways.</p>
+    <p>It will take about <b>10 minutes</b>. Let's start! 🚀</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goTo(1)">Start ▶</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 1: STORY -->
+  <div class="screen" data-screen="1">
+    <h2>Step 1 · Read the Story</h2>
+    <div class="story-box">
+      Jisoo wanted to improve her study habits before the exam period. She began to
+      <span class="expr" tabindex="0">keep track of<span class="tip">to keep a record of something / 무언가를 기록하다, 파악하다</span></span>
+      how long she studied each day. She also learned when to
+      <span class="expr" tabindex="0">take a break<span class="tip">to stop for a short time to rest / 잠시 쉬다</span></span>
+      instead of studying for too long.
+      <br><br>
+      While studying, she tried to
+      <span class="expr" tabindex="0">stay away from<span class="tip">to avoid something / ~을 멀리하다, 피하다</span></span>
+      her phone and made sure to
+      <span class="expr" tabindex="0">get enough sleep<span class="tip">to sleep enough hours / 충분히 자다</span></span>.
+      When she felt stressed, she learned how to
+      <span class="expr" tabindex="0">deal with<span class="tip">to handle or manage a problem / (문제를) 처리하다, 다루다</span></span>
+      it by taking a short walk. After several weeks, she found it easier to
+      <span class="expr" tabindex="0">stick to<span class="tip">to continue doing something without giving up / 계속 지키다, 고수하다</span></span>
+      her new routine.
+    </div>
+    <p class="hint">💡 Tap or click each blue expression to see its meaning.</p>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo(0)">◀ Back</button>
+      <button class="btn-primary" onclick="goTo(2)">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: MATCHING -->
+  <div class="screen" data-screen="2">
+    <h2>Step 2 · Match Expression to Meaning</h2>
+    <p>Click one expression, then click its matching meaning.</p>
+    <div class="match-grid" id="matchGrid"></div>
+    <div class="match-status" id="matchStatus">0 / 6 matched</div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo(1)">◀ Back</button>
+      <button class="btn-primary" id="matchNextBtn" onclick="goTo(3)" disabled>Next ▶</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: FILL IN THE BLANK -->
+  <div class="screen" data-screen="3">
+    <h2>Step 3 · Fill in the Blank</h2>
+    <p>Choose the correct expression for each sentence.</p>
+    <div id="fibList"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo(2)">◀ Back</button>
+      <button class="btn-primary" onclick="checkFib()" id="fibCheckBtn">Check Answers ✓</button>
+      <button class="btn-primary" onclick="goTo(4)" id="fibNextBtn" style="display:none;">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: MCQ -->
+  <div class="screen" data-screen="4">
+    <h2>Step 4 · Choose the Best Expression</h2>
+    <p>These sentences are about everyday student life. Pick the best expression for each.</p>
+    <div id="mcqList"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goTo(3)">◀ Back</button>
+      <button class="btn-primary" id="mcqNextBtn" onclick="goTo(5)" disabled>See Results ▶</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: RESULTS -->
+  <div class="screen" data-screen="5">
+    <h2>🎉 Great Job!</h2>
+    <div class="score-banner">
+      <div>Your Total Score</div>
+      <div class="big" id="finalScore">0 / 9</div>
+    </div>
+    <p><b>Review the 6 expressions:</b></p>
+    <div class="review-list">
+      <div class="review-item"><b>keep track of</b> — to keep a record of something (기록하다, 파악하다)</div>
+      <div class="review-item"><b>take a break</b> — to stop for a short time to rest (잠시 쉬다)</div>
+      <div class="review-item"><b>stay away from</b> — to avoid something (멀리하다, 피하다)</div>
+      <div class="review-item"><b>get enough sleep</b> — to sleep enough hours (충분히 자다)</div>
+      <div class="review-item"><b>deal with</b> — to handle or manage a problem (처리하다, 다루다)</div>
+      <div class="review-item"><b>stick to</b> — to continue without giving up (계속 지키다)</div>
+    </div>
+    <div class="small-note">Well done! Try to use one of these expressions today. 😊</div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="restart()">↺ Try Again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOTAL_SCREENS = 6;
+let current = 0;
+
+function renderProgress(){
+  const wrap = document.getElementById('progressWrap');
+  wrap.innerHTML = '';
+  for(let i=0;i<TOTAL_SCREENS;i++){
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    if(i < current) dot.classList.add('done');
+    if(i === current) dot.classList.add('active');
+    wrap.appendChild(dot);
+  }
+}
+
+function goTo(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`.screen[data-screen="${n}"]`).classList.add('active');
+  current = n;
+  renderProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function restart(){
+  location.reload();
+}
+
+/* ---------------- MATCHING ---------------- */
+const pairs = [
+  {id:1, expr:"keep track of", meaning:"to keep a record of something"},
+  {id:2, expr:"take a break", meaning:"to stop for a short time to rest"},
+  {id:3, expr:"stay away from", meaning:"to avoid something"},
+  {id:4, expr:"get enough sleep", meaning:"to sleep enough hours"},
+  {id:5, expr:"deal with", meaning:"to handle or manage a problem"},
+  {id:6, expr:"stick to", meaning:"to continue doing something without giving up"}
+];
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let selectedExpr = null;
+let selectedMeaning = null;
+let matchedCount = 0;
+
+function buildMatching(){
+  const grid = document.getElementById('matchGrid');
+  grid.innerHTML = '';
+  const exprCol = document.createElement('div');
+  exprCol.className = 'match-col';
+  const meaningCol = document.createElement('div');
+  meaningCol.className = 'match-col';
+
+  const shuffledExpr = shuffle(pairs);
+  const shuffledMeaning = shuffle(pairs);
+
+  shuffledExpr.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.textContent = p.expr;
+    card.dataset.id = p.id;
+    card.dataset.type = 'expr';
+    card.onclick = () => selectCard(card);
+    exprCol.appendChild(card);
+  });
+
+  shuffledMeaning.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.textContent = p.meaning;
+    card.dataset.id = p.id;
+    card.dataset.type = 'meaning';
+    card.onclick = () => selectCard(card);
+    meaningCol.appendChild(card);
+  });
+
+  grid.appendChild(exprCol);
+  grid.appendChild(meaningCol);
+}
+
+function selectCard(card){
+  if(card.classList.contains('correct')) return;
+  if(card.dataset.type === 'expr'){
+    if(selectedExpr) selectedExpr.classList.remove('selected');
+    selectedExpr = card;
+    card.classList.add('selected');
+  } else {
+    if(selectedMeaning) selectedMeaning.classList.remove('selected');
+    selectedMeaning = card;
+    card.classList.add('selected');
+  }
+
+  if(selectedExpr && selectedMeaning){
+    if(selectedExpr.dataset.id === selectedMeaning.dataset.id){
+      selectedExpr.classList.add('correct');
+      selectedMeaning.classList.add('correct');
+      selectedExpr.classList.remove('selected');
+      selectedMeaning.classList.remove('selected');
+      matchedCount++;
+      document.getElementById('matchStatus').textContent = `${matchedCount} / 6 matched`;
+      selectedExpr = null;
+      selectedMeaning = null;
+      if(matchedCount === 6){
+        document.getElementById('matchNextBtn').disabled = false;
+        document.getElementById('matchStatus').textContent = `All matched! 🎉`;
+      }
+    } else {
+      selectedExpr.classList.add('wrong');
+      selectedMeaning.classList.add('wrong');
+      setTimeout(()=>{
+        selectedExpr.classList.remove('wrong','selected');
+        selectedMeaning.classList.remove('wrong','selected');
+        selectedExpr = null;
+        selectedMeaning = null;
+      }, 500);
+    }
+  }
+}
+
+/* ---------------- FILL IN THE BLANK ---------------- */
+const fibData = [
+  {sentence:"It's a good idea to ___ how much time you spend on your phone.", answer:"keep track of"},
+  {sentence:"After two hours of studying, she decided to ___ .", answer:"take a break"},
+  {sentence:"If you want good grades, try to ___ noisy places while studying.", answer:"stay away from"},
+  {sentence:"Doctors say students need to ___ every night.", answer:"get enough sleep"},
+  {sentence:"It's not always easy to ___ stress before exams.", answer:"deal with"},
+  {sentence:"Choose a study plan and try to ___ it, even on busy days.", answer:"stick to"}
+];
+const allExpr = pairs.map(p=>p.expr);
+
+function buildFib(){
+  const list = document.getElementById('fibList');
+  list.innerHTML = '';
+  fibData.forEach((item, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'fib-item';
+    div.id = `fib-${idx}`;
+    const parts = item.sentence.split('___');
+    let selectHtml = `<select id="fibSelect-${idx}"><option value="">-- choose --</option>`;
+    shuffle(allExpr).forEach(e=>{
+      selectHtml += `<option value="${e}">${e}</option>`;
+    });
+    selectHtml += `</select>`;
+    div.innerHTML = `${idx+1}. ${parts[0]} ${selectHtml} ${parts[1]} <span class="feedback-icon" id="fibIcon-${idx}"></span>`;
+    list.appendChild(div);
+  });
+}
+
+let fibScore = 0;
+function checkFib(){
+  fibScore = 0;
+  let allAnswered = true;
+  fibData.forEach((item, idx)=>{
+    const select = document.getElementById(`fibSelect-${idx}`);
+    const div = document.getElementById(`fib-${idx}`);
+    const icon = document.getElementById(`fibIcon-${idx}`);
+    div.classList.remove('correct','wrong');
+    if(!select.value){
+      allAnswered = false;
+      return;
+    }
+    if(select.value === item.answer){
+      div.classList.add('correct');
+      icon.textContent = '✓';
+      icon.className = 'feedback-icon correct';
+      fibScore++;
+    } else {
+      div.classList.add('wrong');
+      icon.textContent = '✗';
+      icon.className = 'feedback-icon wrong';
+    }
+  });
+  if(!allAnswered){
+    alert("Please choose an answer for every sentence!");
+    return;
+  }
+  document.getElementById('fibNextBtn').style.display = 'inline-block';
+}
+
+/* ---------------- MCQ ---------------- */
+const mcqData = [
+  {
+    q:"When I feel very stressed about exams, I try to ___ by going for a walk.",
+    options:["deal with it","keep track of it","stay away from it"],
+    answer:"deal with it"
+  },
+  {
+    q:"I don't check my phone while studying. I try to ___ it.",
+    options:["get enough sleep","stay away from","stick to"],
+    answer:"stay away from"
+  },
+  {
+    q:"Every night, I try to ___ so I can focus better the next day.",
+    options:["get enough sleep","take a break","keep track of"],
+    answer:"get enough sleep"
+  }
+];
+
+let mcqScore = 0;
+let mcqAnswered = 0;
+
+function buildMcq(){
+  const list = document.getElementById('mcqList');
+  list.innerHTML = '';
+  mcqScore = 0;
+  mcqAnswered = 0;
+  mcqData.forEach((item, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'mcq-item';
+    let optsHtml = '<div class="mcq-options">';
+    item.options.forEach((opt, oi)=>{
+      optsHtml += `<button type="button" class="mcq-opt" id="mcqOpt-${idx}-${oi}" onclick="answerMcq(${idx},${oi})">${opt}</button>`;
+    });
+    optsHtml += '</div>';
+    div.innerHTML = `<div class="mcq-q">${idx+1}. ${item.q}</div>${optsHtml}`;
+    list.appendChild(div);
+  });
+}
+
+function answerMcq(idx, oi){
+  const item = mcqData[idx];
+  const chosen = item.options[oi];
+  const allBtns = item.options.map((_,i)=>document.getElementById(`mcqOpt-${idx}-${i}`));
+  // prevent re-answering
+  if(allBtns.some(b=>b.disabled)) return;
+
+  allBtns.forEach((b,i)=>{
+    b.disabled = true;
+    if(item.options[i] === item.answer){
+      b.classList.add('correct');
+    } else if(i === oi){
+      b.classList.add('wrong');
+    }
+  });
+
+  if(chosen === item.answer) mcqScore++;
+  mcqAnswered++;
+
+  if(mcqAnswered === mcqData.length){
+    document.getElementById('mcqNextBtn').disabled = false;
+  }
+}
+
+/* ---------------- RESULTS ---------------- */
+function showResults(){
+  const total = fibScore + mcqScore;
+  document.getElementById('finalScore').textContent = `${total} / 9`;
+}
+
+// Rebuild results whenever screen 5 becomes active
+const origGoTo = goTo;
+goTo = function(n){
+  origGoTo(n);
+  if(n === 5) showResults();
+};
+
+/* init */
+buildMatching();
+buildFib();
+buildMcq();
+renderProgress();
+</script>
+
+</body>
+</html>
