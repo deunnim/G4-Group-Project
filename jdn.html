@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expression Adventure</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, "Trebuchet MS", sans-serif;
+    background: #fff7fb;
+    color: #303344;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+.app {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* HEADER */
+
+.header {
+    background: linear-gradient(135deg, #ffb6d5, #bca8ff);
+    border-radius: 28px;
+    padding: 25px;
+    color: white;
+    box-shadow: 0 8px 20px rgba(80, 70, 100, 0.15);
+    margin-bottom: 15px;
+}
+
+.logo {
+    display: inline-block;
+    background: rgba(255,255,255,0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.header p {
+    margin: 8px 0 0;
+    font-size: 15px;
+}
+
+/* STATUS */
+
+.status {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.status-box {
+    background: white;
+    border-radius: 18px;
+    padding: 14px 17px;
+    box-shadow: 0 5px 15px rgba(60,50,80,0.08);
+}
+
+.progress-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.progress {
+    height: 12px;
+    background: #ececf3;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff83b4, #9f8cff, #69cfff);
+    transition: width 0.3s;
+}
+
+.score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+/* SCREEN */
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.card {
+    background: white;
+    border-radius: 28px;
+    padding: 30px;
+    box-shadow: 0 8px 22px rgba(60,50,80,0.08);
+}
+
+.center {
+    text-align: center;
+}
+
+/* START */
+
+.character {
+    font-size: 75px;
+    margin: 10px 0;
+}
+
+.start-title {
+    font-size: 30px;
+    margin: 10px 0;
+}
+
+.start-text {
+    max-width: 600px;
+    margin: 0 auto 25px;
+    color: #74788a;
+    line-height: 1.6;
+}
+
+.activities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.activity {
+    padding: 18px 10px;
+    border-radius: 18px;
+    font-weight: bold;
+}
+
+.activity:nth-child(1) {
+    background: #ffe0ec;
+}
+
+.activity:nth-child(2) {
+    background: #fff0b9;
+}
+
+.activity:nth-child(3) {
+    background: #dff3ff;
+}
+
+.activity:nth-child(4) {
+    background: #e9e1ff;
+}
+
+.activity:nth-child(5) {
+    background: #dcf7e9;
+}
+
+.activity:nth-child(6) {
+    background: #ffe7d3;
+}
+
+/* BUTTONS */
+
+.main-btn {
+    border: 0;
+    background: #303344;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #1d1f2b;
+}
+
+.main-btn:hover {
+    transform: translateY(-2px);
+}
+
+.secondary-btn {
+    border: 0;
+    background: #ececf3;
+    color: #303344;
+    padding: 12px 20px;
+    border-radius: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* TITLES */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+}
+
+.pink {
+    background: #ffe0ec;
+}
+
+.yellow {
+    background: #fff0b9;
+}
+
+.blue {
+    background: #dff3ff;
+}
+
+.purple {
+    background: #e9e1ff;
+}
+
+.green {
+    background: #dcf7e9;
+}
+
+.section-title h2 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.instruction {
+    color: #74788a;
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+/* EXPRESSIONS */
+
+.expression-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+}
+
+.expression {
+    padding: 18px;
+    border-radius: 20px;
+}
+
+.expression:nth-child(1) {
+    background: #ffe4ee;
+}
+
+.expression:nth-child(2) {
+    background: #fff1bd;
+}
+
+.expression:nth-child(3) {
+    background: #dff3ff;
+}
+
+.expression:nth-child(4) {
+    background: #e9e1ff;
+}
+
+.expression:nth-child(5) {
+    background: #dcf7e9;
+}
+
+.expression:nth-child(6) {
+    background: #ffe7d3;
+}
+
+.expression-word {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 5px;
+}
+
+.expression-meaning {
+    font-size: 14px;
+    color: #666b7a;
+    margin-bottom: 10px;
+}
+
+.expression-example {
+    background: rgba(255,255,255,0.6);
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* MATCH */
+
+.match-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.match-column h3 {
+    text-align: center;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.match-btn {
+    width: 100%;
+    min-height: 65px;
+    border: 3px solid #e8e8ef;
+    background: white;
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.match-btn:hover {
+    border-color: #a18cff;
+}
+
+.match-btn.selected {
+    border-color: #a18cff;
+    background: #f2efff;
+}
+
+.match-btn.correct {
+    border-color: #58c58a;
+    background: #e5f9ed;
+}
+
+.match-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.feedback {
+    min-height: 28px;
+    margin-top: 12px;
+    font-weight: bold;
+}
+
+.correct-text {
+    color: #29945e;
+}
+
+.wrong-text {
+    color: #d84d5c;
+}
+
+/* QUESTION */
+
+.question-number {
+    display: inline-block;
+    background: #eeeaff;
+    color: #7058bd;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.scenario {
+    background: #f7f8fb;
+    border-radius: 20px;
+    padding: 25px;
+    font-size: 20px;
+    line-height: 1.55;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+.options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.option {
+    border: 3px solid #e6e7ed;
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.option:hover {
+    border-color: #a18cff;
+}
+
+.option.correct {
+    border-color: #58c58a;
+    background: #e5f9ed;
+}
+
+.option.wrong {
+    border-color: #ed707c;
+    background: #fff0f1;
+}
+
+.option:disabled {
+    cursor: default;
+}
+
+/* FILL */
+
+.fill-box {
+    background: #f7f8fb;
+    border-radius: 20px;
+    padding: 25px;
+    font-size: 20px;
+    line-height: 2;
+    margin-bottom: 18px;
+}
+
+.blank {
+    display: inline-block;
+    min-width: 190px;
+    border-bottom: 3px solid #303344;
+    margin: 0 5px;
+    padding: 0 5px;
+    font-weight: bold;
+}
+
+.word-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 18px;
+}
+
+.word-btn {
+    border: 0;
+    background: #e9e1ff;
+    color: #40365f;
+    padding: 10px 14px;
+    border-radius: 13px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.word-btn:hover {
+    background: #d9ceff;
+}
+
+/* PERSONAL */
+
+.personal-box {
+    background: linear-gradient(135deg, #fff0f6, #f0edff);
+    border-radius: 22px;
+    padding: 25px;
+}
+
+.personal-expression {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 15px;
+}
+
+.personal-sentence {
+    font-size: 20px;
+    line-height: 2;
+}
+
+.personal-input {
+    border: 0;
+    border-bottom: 3px solid #303344;
+    background: rgba(255,255,255,0.7);
+    border-radius: 7px 7px 0 0;
+    padding: 5px 8px;
+    font-size: 18px;
+    width: 280px;
+    outline: none;
+}
+
+.hint {
+    color: #777c8c;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+/* RESULT */
+
+.trophy {
+    font-size: 80px;
+}
+
+.final-score {
+    font-size: 48px;
+    font-weight: 900;
+    margin: 10px;
+}
+
+.final-message {
+    color: #74788a;
+    line-height: 1.6;
+    font-size: 17px;
+}
+
+/* FOOTER */
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .app {
+        padding: 12px;
+    }
+
+    .status {
+        grid-template-columns: 1fr;
+    }
+
+    .expression-grid,
+    .options,
+    .activities,
+    .match-area {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 27px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .scenario,
+    .fill-box,
+    .personal-sentence {
+        font-size: 18px;
+    }
+
+    .personal-input {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+
+    <div class="header">
+        <div class="logo">ENGLISH EXPRESSION QUEST</div>
+        <h1>🌈 Expression Adventure!</h1>
+        <p>Learn it · Use it · Make it yours!</p>
+    </div>
+
+    <!-- STATUS -->
+
+    <div class="status">
+
+        <div class="status-box">
+
+            <div class="progress-top">
+                <span id="stageText">Ready to start!</span>
+                <span id="percentText">0%</span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+        </div>
+
+        <div class="status-box score">
+            ⭐ <span id="scoreText">0 points</span>
+        </div>
+
+    </div>
+
+
+    <!-- START -->
+
+    <section id="startScreen" class="screen active">
+
+        <div class="card center">
+
+            <div class="character">🦊</div>
+
+            <h2 class="start-title">
+                Ready for your Expression Quest?
+            </h2>
+
+            <p class="start-text">
+                Practice 6 useful English expressions about
+                studying, sleep, stress, habits, and routines.
+                Complete the activities and collect points!
+            </p>
+
+            <div class="activities">
+
+                <div class="activity">📚 Review</div>
+                <div class="activity">🧩 Match</div>
+                <div class="activity">🎯 Choose</div>
+                <div class="activity">✏️ Fill</div>
+                <div class="activity">💬 Create</div>
+                <div class="activity">🏆 Finish</div>
+
+            </div>
+
+            <button class="main-btn" onclick="startGame()">
+                Start My Quest 🚀
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- REVIEW -->
+
+    <section id="reviewScreen" class="screen">
+
+        <div class="card">
+
+            <div class="section-title">
+                <div class="section-icon pink">📚</div>
+                <h2>Quick Review</h2>
+            </div>
+
+            <p class="instruction">
+                Look at the six expressions before you start.
+            </p>
+
+            <div class="expression-grid">
+
+                <div class="expression">
+                    <div class="expression-word">keep track of</div>
+                    <div class="expression-meaning">
+                        계속 기록하다 / 확인하다
+                    </div>
+                    <div class="expression-example">
+                        I <b>keep track of</b> my study time.
+                    </div>
+                </div>
+
+                <div class="expression">
+                    <div class="expression-word">take a break</div>
+                    <div class="expression-meaning">
+                        잠시 쉬다
+                    </div>
+                    <div class="expression-example">
+                        Let's <b>take a break</b>.
+                    </div>
+                </div>
+
+                <div class="expression">
+                    <div class="expression-word">stay away from</div>
+                    <div class="expression-meaning">
+                        ~을 멀리하다
+                    </div>
+                    <div class="expression-example">
+                        I <b>stay away from</b> my phone at night.
+                    </div>
+                </div>
+
+                <div class="expression">
+                    <div class="expression-word">get enough sleep</div>
+                    <div class="expression-meaning">
+                        충분히 자다
+                    </div>
+                    <div class="expression-example">
+                        I need to <b>get enough sleep</b>.
+                    </div>
+                </div>
+
+                <div class="expression">
+                    <div class="expression-word">deal with</div>
+                    <div class="expression-meaning">
+                        ~에 대처하다 / 다루다
+                    </div>
+                    <div class="expression-example">
+                        I can <b>deal with</b> stress.
+                    </div>
+                </div>
+
+                <div class="expression">
+                    <div class="expression-word">stick to</div>
+                    <div class="expression-meaning">
+                        ~을 지키다 / 고수하다
+                    </div>
+                    <div class="expression-example">
+                        I <b>stick to</b> my study plan.
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="nav">
+                <span></span>
+
+                <button class="main-btn" onclick="startMatch()">
+                    Match Up 🧩
+                </button>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MATCH -->
+
+    <section id="matchScreen" class="screen">
+
+        <div class="card">
+
+            <div class="section-title">
+                <div class="section-icon yellow">🧩</div>
+                <h2>Match Up!</h2>
+            </div>
+
+            <p class="instruction">
+                Click an English expression and then click its Korean meaning.
+            </p>
+
+            <div class="match-area">
+
+                <div class="match-column">
+
+                    <h3>🇬🇧 Expressions</h3>
+
+                    <div id="expressionColumn"></div>
+
+                </div>
+
+                <div class="match-column">
+
+                    <h3>🇰🇷 Meanings</h3>
+
+                    <div id="meaningColumn"></div>
+
+                </div>
+
+            </div>
+
+            <div id="matchFeedback" class="feedback"></div>
+
+            <div class="nav">
+
+                <span id="matchCount">
+                    0 / 6 matched
+                </span>
+
+                <button
+                    id="matchNext"
+                    class="main-btn"
+                    onclick="goToChoose()"
+                    disabled>
+                    Next 🎯
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CHOOSE -->
+
+    <section id="chooseScreen" class="screen">
+
+        <div class="card">
+
+            <div class="section-title">
+                <div class="section-icon blue">🎯</div>
+                <h2>Expression Detective</h2>
+            </div>
+
+            <p class="instruction">
+                Read the situation and choose the expression that fits best.
+            </p>
+
+            <div id="chooseNumber" class="question-number"></div>
+
+            <div id="scenario" class="scenario"></div>
+
+            <div id="options" class="options"></div>
+
+            <div id="chooseFeedback" class="feedback"></div>
+
+            <div class="nav">
+
+                <span>⭐ <span id="chooseCurrentScore">0</span></span>
+
+                <button class="main-btn" onclick="nextChoose()">
+                    Next →
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FILL -->
+
+    <section id="fillScreen" class="screen">
+
+        <div class="card">
+
+            <div class="section-title">
+                <div class="section-icon purple">✏️</div>
+                <h2>Fill the Gap</h2>
+            </div>
+
+            <p class="instruction">
+                Choose the expression that completes the sentence.
+            </p>
+
+            <div id="fillNumber" class="question-number"></div>
+
+            <div id="fillSentence" class="fill-box"></div>
+
+            <div id="wordBank" class="word-bank"></div>
+
+            <div id="fillFeedback" class="feedback"></div>
+
+            <div class="nav">
+
+                <span>⭐ <span id="fillCurrentScore">0</span></span>
+
+                <button class="main-btn" onclick="nextFill()">
+                    Next →
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PERSONAL -->
+
+    <section id="personalScreen" class="screen">
+
+        <div class="card">
+
+            <div class="section-title">
+                <div class="section-icon green">💬</div>
+                <h2>Make It Yours!</h2>
+            </div>
+
+            <p class="instruction">
+                Use the expression to make a sentence about yourself.
+                There is no single correct answer!
+            </p>
+
+            <div class="personal-box">
+
+                <div id="personalNumber" class="question-number"></div>
+
+                <div id="personalExpression" class="personal-expression"></div>
+
+                <div id="personalSentence" class="personal-sentence"></div>
+
+                <div id="personalHint" class="hint"></div>
+
+            </div>
+
+            <div id="personalFeedback" class="feedback"></div>
+
+            <div class="nav">
+
+                <button
+                    id="personalBack"
+                    class="secondary-btn"
+                    onclick="previousPersonal()">
+                    ← Back
+                </button>
+
+                <button
+                    id="personalNext"
+                    class="main-btn"
+                    onclick="nextPersonal()">
+                    Next →
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RESULT -->
+
+    <section id="resultScreen" class="screen">
+
+        <div class="card center">
+
+            <div class="trophy">🏆</div>
+
+            <h2>Quest Complete!</h2>
+
+            <div class="final-score" id="finalScore">
+                0 points
+            </div>
+
+            <p class="final-message" id="finalMessage"></p>
+
+            <div style="font-size:40px; margin:25px;">
+                🌟 🦊 🌈 💖
+            </div>
+
+            <button class="main-btn" onclick="restartGame()">
+                Play Again 🔄
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================
+   DATA
+========================= */
+
+const expressions = [
+    "keep track of",
+    "take a break",
+    "stay away from",
+    "get enough sleep",
+    "deal with",
+    "stick to"
+];
+
+const meanings = [
+    "계속 기록하다 / 확인하다",
+    "잠시 쉬다",
+    "~을 멀리하다",
+    "충분히 자다",
+    "~에 대처하다 / 다루다",
+    "~을 지키다 / 고수하다"
+];
+
+
+/* =========================
+   GAME STATE
+========================= */
+
+let score = 0;
+
+let selectedExpression = null;
+let selectedMeaning = null;
+let matched = 0;
+
+let chooseIndex = 0;
+let chooseAnswered = false;
+
+let fillIndex = 0;
+let fillAnswered = false;
+
+let personalIndex = 0;
+
+
+/* =========================
+   QUESTIONS
+========================= */
+
+const chooseQuestions = [
+
+    {
+        scenario:
+        "You write down how many hours you study every day because you want to know your study habits.",
+        answer: "keep track of"
+    },
+
+    {
+        scenario:
+        "You've studied for two hours. You are tired, so you stop studying for ten minutes.",
+        answer: "take a break"
+    },
+
+    {
+        scenario:
+        "You want to sleep better, so you don't use your phone before bed.",
+        answer: "stay away from"
+    },
+
+    {
+        scenario:
+        "You have a test tomorrow, so you go to bed early tonight.",
+        answer: "get enough sleep"
+    },
+
+    {
+        scenario:
+        "You feel stressed about your homework, so you make a plan to solve the problems.",
+        answer: "deal with"
+    },
+
+    {
+        scenario:
+        "You decide to study English for 20 minutes every day and continue following your plan.",
+        answer: "stick to"
+    }
+
+];
+
+
+const fillQuestions = [
+
+    {
+        before: "I use a notebook to",
+        after: "how much I study every day.",
+        answer: "keep track of"
+    },
+
+    {
+        before: "You've been studying for a long time. You should",
+        after: "for ten minutes.",
+        answer: "take a break"
+    },
+
+    {
+        before: "I try to",
+        after: "my phone before I go to bed.",
+        answer: "stay away from"
+    },
+
+    {
+        before: "I need to",
+        after: "because I have to wake up early tomorrow.",
+        answer: "get enough sleep"
+    },
+
+    {
+        before: "Talking to a friend helps me",
+        after: "stress.",
+        answer: "deal with"
+    },
+
+    {
+        before: "I made a study plan, and I want to",
+        after: "it.",
+        answer: "stick to"
+    }
+
+];
+
+
+const personalPrompts = [
+
+    {
+        expression: "keep track of",
+        sentence: "I keep track of",
+        hint: "my study time / my steps / my spending"
+    },
+
+    {
+        expression: "take a break",
+        sentence: "I take a break when",
+        hint: "I feel tired / I study for a long time"
+    },
+
+    {
+        expression: "stay away from",
+        sentence: "I try to stay away from",
+        hint: "junk food / my phone before bed"
+    },
+
+    {
+        expression: "get enough sleep",
+        sentence: "I get enough sleep when",
+        hint: "Think about your bedtime or morning routine."
+    },
+
+    {
+        expression: "deal with",
+        sentence: "I deal with stress by",
+        hint: "listening to music / talking to a friend"
+    },
+
+    {
+        expression: "stick to",
+        sentence: "I try to stick to",
+        hint: "my study plan / my exercise routine"
+    }
+
+];
+
+
+/* =========================
+   BASIC FUNCTIONS
+========================= */
+
+function showScreen(id) {
+
+    const screens = document.querySelectorAll(".screen");
+
+    screens.forEach(function(screen) {
+        screen.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+}
+
+
+function updateScore() {
+
+    document.getElementById("scoreText").textContent =
+        score + " points";
+
+    document.getElementById("chooseCurrentScore").textContent =
+        score;
+
+    document.getElementById("fillCurrentScore").textContent =
+        score;
+}
+
+
+function updateProgress(percent, text) {
+
+    document.getElementById("progressBar").style.width =
+        percent + "%";
+
+    document.getElementById("percentText").textContent =
+        percent + "%";
+
+    document.getElementById("stageText").textContent =
+        text;
+
+    updateScore();
+}
+
+
+/* =========================
+   START
+========================= */
+
+function startGame() {
+
+    score = 0;
+
+    updateProgress(10, "Quick Review 📚");
+
+    showScreen("reviewScreen");
+}
+
+
+/* =========================
+   MATCH
+========================= */
+
+function startMatch() {
+
+    matched = 0;
+
+    selectedExpression = null;
+    selectedMeaning = null;
+
+    updateProgress(25, "Match Up! 🧩");
+
+    showScreen("matchScreen");
+
+    createMatchButtons();
+}
+
+
+function createMatchButtons() {
+
+    const expressionColumn =
+        document.getElementById("expressionColumn");
+
+    const meaningColumn =
+        document.getElementById("meaningColumn");
+
+    expressionColumn.innerHTML = "";
+    meaningColumn.innerHTML = "";
+
+    let meaningOrder = [0,1,2,3,4,5];
+
+    meaningOrder.sort(function() {
+        return Math.random() - 0.5;
+    });
+
+
+    expressions.forEach(function(expression, index) {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "match-btn";
+        button.textContent = expression;
+
+        button.dataset.index = index;
+
+        button.onclick = function() {
+            selectExpression(button, index);
+        };
+
+        expressionColumn.appendChild(button);
+
+    });
+
+
+    meaningOrder.forEach(function(index) {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "match-btn";
+        button.textContent = meanings[index];
+
+        button.dataset.index = index;
+
+        button.onclick = function() {
+            selectMeaning(button, index);
+        };
+
+        meaningColumn.appendChild(button);
+
+    });
+
+
+    updateMatchCount();
+}
+
+
+function selectExpression(button, index) {
+
+    if (button.classList.contains("disabled")) {
+        return;
+    }
+
+    document.querySelectorAll(
+        "#expressionColumn .match-btn"
+    ).forEach(function(btn) {
+        btn.classList.remove("selected");
+    });
+
+    button.classList.add("selected");
+
+    selectedExpression = index;
+
+    checkMatch();
+}
+
+
+function selectMeaning(button, index) {
+
+    if (button.classList.contains("disabled")) {
+        return;
+    }
+
+    document.querySelectorAll(
+        "#meaningColumn .match-btn"
+    ).forEach(function(btn) {
+        btn.classList.remove("selected");
+    });
+
+    button.classList.add("selected");
+
+    selectedMeaning = index;
+
+    checkMatch();
+}
+
+
+function checkMatch() {
+
+    if (
+        selectedExpression === null ||
+        selectedMeaning === null
+    ) {
+        return;
+    }
+
+
+    const feedback =
+        document.getElementById("matchFeedback");
+
+
+    if (selectedExpression === selectedMeaning) {
+
+        const expressionButton =
+            document.querySelector(
+                '#expressionColumn .match-btn[data-index="' +
+                selectedExpression +
+                '"]'
+            );
+
+        const meaningButton =
+            document.querySelector(
+                '#meaningColumn .match-btn[data-index="' +
+                selectedMeaning +
+                '"]'
+            );
+
+
+        expressionButton.classList.remove("selected");
+        meaningButton.classList.remove("selected");
+
+        expressionButton.classList.add("correct");
+        meaningButton.classList.add("correct");
+
+        expressionButton.classList.add("disabled");
+        meaningButton.classList.add("disabled");
+
+        matched++;
+
+        score += 1;
+
+        feedback.textContent =
+            "Perfect! ✨";
+
+        feedback.className =
+            "feedback correct-text";
+
+        selectedExpression = null;
+        selectedMeaning = null;
+
+        updateMatchCount();
+        updateScore();
+
+
+        if (matched === 6) {
+
+            document.getElementById("matchNext").disabled = false;
+
+        }
+
+    } else {
+
+        feedback.textContent =
+            "Not quite! Try again. 💭";
+
+        feedback.className =
+            "feedback wrong-text";
+
+
+        setTimeout(function() {
+
+            document.querySelectorAll(".match-btn")
+                .forEach(function(btn) {
+                    btn.classList.remove("selected");
+                });
+
+            selectedExpression = null;
+            selectedMeaning = null;
+
+        }, 400);
+
+    }
+}
+
+
+function updateMatchCount() {
+
+    document.getElementById("matchCount").textContent =
+        matched + " / 6 matched";
+}
+
+
+function goToChoose() {
+
+    chooseIndex = 0;
+
+    updateProgress(45, "Expression Detective 🎯");
+
+    showScreen("chooseScreen");
+
+    renderChoose();
+}
+
+
+/* =========================
+   CHOOSE
+========================= */
+
+function renderChoose() {
+
+    chooseAnswered = false;
+
+    const question =
+        chooseQuestions[chooseIndex];
+
+
+    document.getElementById("chooseNumber").textContent =
+        "Question " +
+        (chooseIndex + 1) +
+        " / " +
+        chooseQuestions.length;
+
+
+    document.getElementById("scenario").textContent =
+        question.scenario;
+
+
+    document.getElementById("chooseFeedback").textContent = "";
+
+    document.getElementById("chooseFeedback").className =
+        "feedback";
+
+
+    const options =
+        document.getElementById("options");
+
+    options.innerHTML = "";
+
+
+    let choices = [
+        question.answer
+    ];
+
+
+    expressions
+        .filter(function(item) {
+            return item !== question.answer;
+        })
+        .sort(function() {
+            return Math.random() - 0.5;
+        })
+        .slice(0,3)
+        .forEach(function(item) {
+            choices.push(item);
+        });
+
+
+    choices.sort(function() {
+        return Math.random() - 0.5;
+    });
+
+
+    choices.forEach(function(choice) {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "option";
+        button.textContent = choice;
+
+        button.onclick = function() {
+            checkChoose(button, choice);
+        };
+
+        options.appendChild(button);
+
+    });
+
+
+    updateScore();
+}
+
+
+function checkChoose(button, choice) {
+
+    if (chooseAnswered) {
+        return;
+    }
+
+    chooseAnswered = true;
+
+
+    const answer =
+        chooseQuestions[chooseIndex].answer;
+
+
+    document.querySelectorAll("#options .option")
+        .forEach(function(option) {
+            option.disabled = true;
+        });
+
+
+    if (choice === answer) {
+
+        button.classList.add("correct");
+
+        score += 2;
+
+        document.getElementById("chooseFeedback").textContent =
+            "Correct! 🎉";
+
+        document.getElementById("chooseFeedback").className =
+            "feedback correct-text";
+
+    } else {
+
+        button.classList.add("wrong");
+
+
+        document.querySelectorAll("#options .option")
+            .forEach(function(option) {
+
+                if (option.textContent === answer) {
+                    option.classList.add("correct");
+                }
+
+            });
+
+
+        document.getElementById("chooseFeedback").textContent =
+            "The answer is: " + answer;
+
+        document.getElementById("chooseFeedback").className =
+            "feedback wrong-text";
+    }
+
+
+    updateScore();
+}
+
+
+function nextChoose() {
+
+    if (!chooseAnswered) {
+
+        document.getElementById("chooseFeedback").textContent =
+            "Choose an answer first! 👀";
+
+        document.getElementById("chooseFeedback").className =
+            "feedback wrong-text";
+
+        return;
+    }
+
+
+    chooseIndex++;
+
+
+    if (chooseIndex < chooseQuestions.length) {
+
+        renderChoose();
+
+    } else {
+
+        startFill();
+
+    }
+
+}
+
+
+/* =========================
+   FILL
+========================= */
+
+function startFill() {
+
+    fillIndex = 0;
+
+    updateProgress(65, "Fill the Gap ✏️");
+
+    showScreen("fillScreen");
+
+    renderFill();
+}
+
+
+function renderFill() {
+
+    fillAnswered = false;
+
+
+    const question =
+        fillQuestions[fillIndex];
+
+
+    document.getElementById("fillNumber").textContent =
+        "Question " +
+        (fillIndex + 1) +
+        " / " +
+        fillQuestions.length;
+
+
+    document.getElementById("fillSentence").innerHTML =
+        question.before +
+        ' <span class="blank" id="blank">_____</span> ' +
+        question.after;
+
+
+    document.getElementById("fillFeedback").textContent = "";
+
+    document.getElementById("fillFeedback").className =
+        "feedback";
+
+
+    const wordBank =
+        document.getElementById("wordBank");
+
+    wordBank.innerHTML = "";
+
+
+    let words = [...expressions];
+
+    words.sort(function() {
+        return Math.random() - 0.5;
+    });
+
+
+    words.forEach(function(word) {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "word-btn";
+        button.textContent = word;
+
+        button.onclick = function() {
+            checkFill(word);
+        };
+
+        wordBank.appendChild(button);
+
+    });
+
+
+    updateScore();
+}
+
+
+function checkFill(word) {
+
+    if (fillAnswered) {
+        return;
+    }
+
+
+    const question =
+        fillQuestions[fillIndex];
+
+
+    document.getElementById("blank").textContent =
+        word;
+
+
+    if (word === question.answer) {
+
+        fillAnswered = true;
+
+        score += 2;
+
+        document.getElementById("fillFeedback").textContent =
+            "Correct! ✨";
+
+        document.getElementById("fillFeedback").className =
+            "feedback correct-text";
+
+    } else {
+
+        document.getElementById("fillFeedback").textContent =
+            "Try again! Think about the meaning. 🤔";
+
+        document.getElementById("fillFeedback").className =
+            "feedback wrong-text";
+    }
+
+
+    updateScore();
+}
+
+
+function nextFill() {
+
+    if (!fillAnswered) {
+
+        document.getElementById("fillFeedback").textContent =
+            "Choose the correct expression first! 👀";
+
+        document.getElementById("fillFeedback").className =
+            "feedback wrong-text";
+
+        return;
+    }
+
+
+    fillIndex++;
+
+
+    if (fillIndex < fillQuestions.length) {
+
+        renderFill();
+
+    } else {
+
+        startPersonal();
+
+    }
+
+}
+
+
+/* =========================
+   PERSONAL
+========================= */
+
+function startPersonal() {
+
+    personalIndex = 0;
+
+    updateProgress(85, "Make It Yours! 💬");
+
+    showScreen("personalScreen");
+
+    renderPersonal();
+}
+
+
+function renderPersonal() {
+
+    const prompt =
+        personalPrompts[personalIndex];
+
+
+    document.getElementById("personalNumber").textContent =
+        "Expression " +
+        (personalIndex + 1) +
+        " / " +
+        personalPrompts.length;
+
+
+    document.getElementById("personalExpression").textContent =
+        prompt.expression;
+
+
+    document.getElementById("personalSentence").innerHTML =
+        prompt.sentence +
+        ' <input id="personalInput" class="personal-input" type="text" placeholder="your idea">.';
+
+
+    document.getElementById("personalHint").textContent =
+        "💡 " + prompt.hint;
+
+
+    document.getElementById("personalFeedback").textContent =
+        "";
+
+
+    document.getElementById("personalNext").textContent =
+        personalIndex === personalPrompts.length - 1
+        ? "Finish 🏆"
+        : "Next →";
+
+
+    document.getElementById("personalBack").style.visibility =
+        personalIndex === 0
+        ? "hidden"
+        : "visible";
+}
+
+
+function previousPersonal() {
+
+    if (personalIndex > 0) {
+
+        personalIndex--;
+
+        renderPersonal();
+
+    }
+
+}
+
+
+function nextPersonal() {
+
+    const input =
+        document.getElementById("personalInput");
+
+
+    if (!input.value.trim()) {
+
+        document.getElementById("personalFeedback").textContent =
+            "Write your own idea first! ✏️";
+
+        document.getElementById("personalFeedback").className =
+            "feedback wrong-text";
+
+        input.focus();
+
+        return;
+    }
+
+
+    personalIndex++;
+
+
+    if (personalIndex < personalPrompts.length) {
+
+        renderPersonal();
+
+    } else {
+
+        finishGame();
+
+    }
+
+}
+
+
+/* =========================
+   FINISH
+========================= */
+
+function finishGame() {
+
+    updateProgress(100, "Quest Complete! 🏆");
+
+    showScreen("resultScreen");
+
+
+    document.getElementById("finalScore").textContent =
+        score + " points";
+
+
+    let message;
+
+
+    if (score >= 30) {
+
+        message =
+            "Amazing! 🌟 You really know how to use these expressions!";
+
+    } else if (score >= 22) {
+
+        message =
+            "Great job! 🎉 You have a strong understanding of the expressions.";
+
+    } else if (score >= 14) {
+
+        message =
+            "Nice work! 💪 Keep practicing and these expressions will become easier.";
+
+    } else {
+
+        message =
+            "Good start! 🌱 Review the expressions and try again.";
+
+    }
+
+
+    document.getElementById("finalMessage").textContent =
+        message;
+}
+
+
+/* =========================
+   RESTART
+========================= */
+
+function restartGame() {
+
+    score = 0;
+
+    selectedExpression = null;
+    selectedMeaning = null;
+
+    matched = 0;
+
+    chooseIndex = 0;
+    chooseAnswered = false;
+
+    fillIndex = 0;
+    fillAnswered = false;
+
+    personalIndex = 0;
+
+
+    document.getElementById("matchNext").disabled = true;
+
+
+    updateProgress(0, "Ready to start!");
+
+    showScreen("startScreen");
+}
+
+
+/* =========================
+   INITIALIZE
+========================= */
+
+updateProgress(0, "Ready to start!");
+
+</script>
+
+</body>
+</html>
